@@ -7,4 +7,4 @@
 [dependencies]
 
 [workspace]
-    members = [ "crates/cache-wasi-redis-host", "crates/http-wasi-wasmtime" ]
+    members = [ "crates/cache-wasi-redis-wasmtime", "crates/http-wasi-wasmtime" ]
