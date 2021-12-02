@@ -1,5 +1,5 @@
 [package]
-    name    = "http"
+    name    = "http-wasi-wasmtime"
     version = "0.1.0"
     edition = "2021"
     authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
