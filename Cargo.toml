@@ -1,0 +1,10 @@
+[package]
+    name    = "wasi-experimental-toolkit"
+    version = "0.1.0"
+    edition = "2021"
+    authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
+
+[dependencies]
+
+[workspace]
+    members = [ "crates/cache-wasi-redis-host", "crates/http" ]

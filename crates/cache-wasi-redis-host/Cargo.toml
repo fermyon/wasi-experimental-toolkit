@@ -1,0 +1,14 @@
+[package]
+    name    = "cache-wasi-redis-host"
+    version = "0.1.0"
+    edition = "2021"
+    authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
+
+[lib]
+    crate-type = [ "cdylib" ]
+
+[dependencies]
+    anyhow               = "1.0"
+    redis                = { version = "0.21", features = [ "tokio-comp" ] }
+    tokio                = { version = "1.14", features = [ "full" ] }
+    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }

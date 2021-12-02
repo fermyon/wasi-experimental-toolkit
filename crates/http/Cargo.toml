@@ -1,0 +1,15 @@
+[package]
+    name    = "http"
+    version = "0.1.0"
+    edition = "2021"
+    authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
+
+[dependencies]
+    anyhow               = "1.0"
+    bytes                = "1"
+    futures              = "0.3"
+    http                 = "0.2"
+    reqwest              = { version = "0.11", default-features = true, features = [ "json", "blocking" ] }
+    tokio                = { version = "1.4.0", features = [ "full" ] }
+    url                  = "2.2.1"
+    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }

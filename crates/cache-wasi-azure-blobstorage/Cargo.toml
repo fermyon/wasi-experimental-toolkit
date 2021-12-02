@@ -1,0 +1,23 @@
+[package]
+    name    = "cache-wasi-azure-blobstorage"
+    version = "0.1.0"
+    edition = "2021"
+    authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
+
+[lib]
+    crate-type = [ "cdylib" ]
+
+[dependencies]
+    anyhow           = "1.0"
+    azure_core       = { git = "https://github.com/radu-matei/azure-sdk-for-rust", branch = "enable-wasi-experimental-http", features = [ "enable_wasi_experimental_http" ] }
+    azure_storage    = { git = "https://github.com/radu-matei/azure-sdk-for-rust", branch = "enable-wasi-experimental-http" }
+    bytes            = "1"
+    futures          = "0.3"
+    wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }
+
+# The patches below currently require this to be a separate workspace.
+[workspace]
+
+[patch.crates-io]
+    ring   = { git = "https://github.com/radu-matei/ring", branch = "wasm32-wasi", version = "0.16.20" }
+    oauth2 = { git = "https://github.com/radu-matei/oauth2-rs", branch = "wasm32-wasi" }
