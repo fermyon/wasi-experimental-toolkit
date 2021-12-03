@@ -15,6 +15,11 @@ impl test::Test for Test {
         let res = wasi_cache::get(key)?;
         assert_eq!(value.as_bytes(), res);
 
+        println!(
+            "cache_rust_test:: read value {}",
+            std::str::from_utf8(&res).unwrap()
+        );
+
         println!("cache_rust_test:: deleting key {}", key);
         wasi_cache::delete(key)?;
 
