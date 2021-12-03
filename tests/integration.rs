@@ -2,7 +2,7 @@
 mod http_tests {
     use super::runtime::*;
     use anyhow::Result;
-    use http_wasi_wasmtime::OutboundHttp;
+    use wasi_outbound_http_wasmtime::OutboundHttp;
     use wasmtime::Linker;
 
     const HTTP_RUST_TEST: &str =
@@ -15,7 +15,7 @@ mod http_tests {
         ])));
 
         let add_imports = |linker: &mut Linker<Context<_>>| {
-            http_wasi_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
+            wasi_outbound_http_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
                 ctx.runtime_data.as_mut().unwrap()
             })
         };
@@ -29,7 +29,7 @@ mod http_tests {
         let data = Some(OutboundHttp::new(None));
 
         let add_imports = |linker: &mut Linker<Context<_>>| {
-            http_wasi_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
+            wasi_outbound_http_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
                 ctx.runtime_data.as_mut().unwrap()
             })
         };

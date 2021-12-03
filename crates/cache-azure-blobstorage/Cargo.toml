@@ -1,5 +1,5 @@
 [package]
-    name    = "cache-wasi-azure-blobstorage"
+    name    = "wasi-cache-azure-blobstorage"
     version = "0.1.0"
     edition = "2021"
     authors = [ "Radu Matei <radu.matei@fermyon.com>" ]

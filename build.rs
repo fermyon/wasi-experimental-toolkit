@@ -8,10 +8,11 @@ const WIT_BINDGEN_REVISION: &str = "32e63116d469d8046727fae3c1333a7d35d0c5d3";
 
 const WIT_DIRECTORY: &str = "wit/ephemeral/*";
 
-const CACHE_FS: &str = "crates/cache-wasi-fs";
-const CACHE_AZURE: &str = "crates/cache-wasi-azure-blobstorage";
+const CACHE_FS: &str = "crates/cache-fs";
+const CACHE_AZURE: &str = "crates/cache-azure-blobstorage";
 
 const HTTP_RUST_TEST: &str = "tests/modules/http-rust-hello";
+const CACHE_RUST_TEST: &str = "tests/modules/http-rust-hello";
 
 fn main() {
     println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
@@ -20,6 +21,7 @@ fn main() {
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
     cargo_wasi_build(HTTP_RUST_TEST);
+    cargo_wasi_build(CACHE_RUST_TEST);
 
     check_tools();
 }
