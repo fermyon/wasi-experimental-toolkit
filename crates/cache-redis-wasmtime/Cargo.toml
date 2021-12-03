@@ -9,6 +9,8 @@
 
 [dependencies]
     anyhow               = "1.0"
+    env_logger           = "0.9"
+    log                  = { version = "0.4", default-features = false }
     redis                = { version = "0.21", features = [ "tokio-comp" ] }
     tokio                = { version = "1.14", features = [ "full" ] }
     wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }

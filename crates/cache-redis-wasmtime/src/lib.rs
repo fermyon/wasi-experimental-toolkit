@@ -23,17 +23,20 @@ impl wasi_cache::WasiCache for RedisCache {
     /// Set the payload for the given key.
     /// If provided, the time-to-live argument (in seconds) will be used to set the expiration time.
     fn set(&mut self, key: &str, value: PayloadParam<'_>, ttl: Option<u32>) -> Result<(), Error> {
+        log::info!("setting key {}", key);
         self.set(key, value, ttl)?;
         Ok(())
     }
 
     /// Get the payload for the given key.
     fn get(&mut self, key: &str) -> Result<PayloadResult, Error> {
+        log::info!("getting key {}", key);
         Ok(self.get(key)?)
     }
 
     /// Delete the entry for the given key.
     fn delete(&mut self, key: &str) -> Result<(), Error> {
+        log::info!("deleting key {}", key);
         Ok(self.delete(key)?)
     }
 }
