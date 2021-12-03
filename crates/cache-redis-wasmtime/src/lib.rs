@@ -10,6 +10,7 @@ pub use wasi_cache::add_to_linker;
 wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_cache.wit");
 
 /// Redis implementation for the WASI cache interface.
+#[derive(Clone)]
 pub struct RedisCache {
     /// The address of the Redis instance.
     pub address: String,

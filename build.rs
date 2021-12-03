@@ -12,7 +12,8 @@ const CACHE_FS: &str = "crates/cache-fs";
 const CACHE_AZURE: &str = "crates/cache-azure-blobstorage";
 
 const HTTP_RUST_TEST: &str = "tests/modules/http-rust-hello";
-const CACHE_RUST_TEST: &str = "tests/modules/http-rust-hello";
+const CACHE_RUST_TEST: &str = "tests/modules/cache-rust";
+const CACHE_CPP_TEST: &str = "tests/modules/cache-cpp";
 
 fn main() {
     println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
@@ -23,6 +24,8 @@ fn main() {
     cargo_wasi_build(HTTP_RUST_TEST);
     cargo_wasi_build(CACHE_RUST_TEST);
 
+    wasi_sdk_make(CACHE_CPP_TEST);
+
     check_tools();
 }
 
@@ -32,6 +35,10 @@ fn cargo_wasi_build(dir: &str) {
         Some(dir),
         None,
     );
+}
+
+fn wasi_sdk_make(dir: &str) {
+    run(vec!["make", "bindgen", "build"], Some(dir), None)
 }
 
 fn check_tools() {

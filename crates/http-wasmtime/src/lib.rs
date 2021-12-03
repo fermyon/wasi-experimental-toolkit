@@ -10,7 +10,7 @@ pub use wasi_outbound_http::add_to_linker;
 wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_outbound_http.wit");
 
 /// A very simple implementation for outbound HTTP requests.
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct OutboundHttp {
     /// List of hosts guest modules are allowed to make requests to.
     pub allowed_hosts: Arc<Option<Vec<String>>>,

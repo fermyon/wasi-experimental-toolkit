@@ -52,6 +52,7 @@ mod redis_tests {
     const REDIS_SERVER_CLI: &str = "redis-server";
     const CACHE_RUST_TEST: &str =
         "tests/modules/cache-rust/target/wasm32-wasi/release/cache_rust.wasm";
+    // const CACHE_CPP_TEST: &str = "tests/modules/cache-cpp/ctest.wasm";
 
     #[tokio::test]
     async fn test_redis_get_set_delete() -> Result<()> {
@@ -64,7 +65,8 @@ mod redis_tests {
             })
         };
 
-        exec(CACHE_RUST_TEST, data, add_imports)
+        // exec(CACHE_CPP_TEST, data, add_imports)?;
+        exec(CACHE_RUST_TEST, data.clone(), add_imports)
     }
 
     pub struct RedisTestController {
