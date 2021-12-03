@@ -4,9 +4,6 @@
     edition = "2021"
     authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
 
-[lib]
-    crate-type = [ "cdylib" ]
-
 [dependencies]
     anyhow               = "1.0"
     redis                = { version = "0.21", features = [ "tokio-comp" ] }

@@ -1,32 +1,124 @@
 #[cfg(test)]
-mod tests {
+mod http_tests {
+    use super::runtime::*;
     use anyhow::Result;
     use http_wasi_wasmtime::OutboundHttp;
-    use wasi_cap_std_sync::WasiCtxBuilder;
-    use wasi_common::WasiCtx;
-    use wasmtime::{Config, Engine, Instance, Linker, Module, Store};
-
-    wit_bindgen_wasmtime::import!("tests/test.wit");
+    use wasmtime::Linker;
 
     const HTTP_RUST_TEST: &str =
         "tests/modules/http-rust-hello/target/wasm32-wasi/release/http_rust_hello.wasm";
 
     #[test]
     fn test_http_allowed() -> Result<()> {
-        let allowed = Some(vec!["https://api.brigade.sh".to_string()]);
-        test_http(HTTP_RUST_TEST, allowed)
+        let data = Some(OutboundHttp::new(Some(vec![
+            "https://api.brigade.sh".to_string()
+        ])));
+
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            http_wasi_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(HTTP_RUST_TEST, data, add_imports)
     }
 
     #[test]
     #[should_panic]
     fn test_http_not_allowed() {
-        let allowed = None;
-        test_http(HTTP_RUST_TEST, allowed).unwrap();
+        let data = Some(OutboundHttp::new(None));
+
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            http_wasi_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(HTTP_RUST_TEST, data, add_imports).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod redis_tests {
+    use super::runtime::*;
+    use anyhow::Result;
+    use cache_wasi_redis_wasmtime::RedisCache;
+    use std::{
+        net::{Ipv4Addr, SocketAddrV4, TcpListener},
+        process::{Child, Command},
+    };
+    use wasmtime::Linker;
+
+    const REDIS_SERVER_CLI: &str = "redis-server";
+    const CACHE_RUST_TEST: &str =
+        "tests/modules/cache-rust/target/wasm32-wasi/release/cache_rust.wasm";
+
+    #[tokio::test]
+    async fn test_redis_get_set_delete() -> Result<()> {
+        let redis = RedisTestController::new().await?;
+        let data = Some(RedisCache::new(&redis.address)?);
+
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            cache_wasi_redis_wasmtime::add_to_linker(linker, |ctx| -> &mut RedisCache {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(CACHE_RUST_TEST, data, add_imports)
     }
 
-    fn test_http(wasm: &str, allowed: Option<Vec<String>>) -> Result<()> {
+    pub struct RedisTestController {
+        pub address: String,
+        server_handle: Child,
+    }
+
+    impl RedisTestController {
+        pub async fn new() -> Result<RedisTestController> {
+            let port = get_random_port();
+            let address = format!("redis://localhost:{}", port);
+
+            let server_handle = Command::new(REDIS_SERVER_CLI)
+                .args(&["--port", port.to_string().as_str()])
+                .spawn()?;
+
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+
+            Ok(Self {
+                address,
+                server_handle,
+            })
+        }
+    }
+
+    impl Drop for RedisTestController {
+        fn drop(&mut self) {
+            let _ = self.server_handle.kill();
+        }
+    }
+
+    fn get_random_port() -> u16 {
+        TcpListener::bind(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 0))
+            .expect("Unable to bind to check for port")
+            .local_addr()
+            .unwrap()
+            .port()
+    }
+}
+
+mod runtime {
+    use anyhow::Result;
+    use wasi_cap_std_sync::WasiCtxBuilder;
+    use wasi_common::WasiCtx;
+    use wasmtime::{Config, Engine, Instance, Linker, Module, Store};
+
+    wit_bindgen_wasmtime::import!("tests/test.wit");
+
+    pub fn exec<T>(
+        wasm: &str,
+        runtime_data: Option<T>,
+        add_imports: impl FnOnce(&mut Linker<Context<T>>) -> Result<()>,
+    ) -> Result<()> {
         let wasi = default_wasi();
-        let runtime_data = Some(OutboundHttp::new(allowed));
         let test_data = Some(test::TestData::default());
         let ctx = Context {
             wasi,
@@ -34,17 +126,7 @@ mod tests {
             test_data,
         };
 
-        let imports = |linker: &mut Linker<Context<_>>| {
-            http_wasi_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
-                ctx.runtime_data.as_mut().unwrap()
-            })
-        };
-
-        let (store, instance) = instantiate(wasm, ctx, imports)?;
-        execute_test(store, instance)
-    }
-
-    fn execute_test<T>(mut store: Store<Context<T>>, mut instance: Instance) -> Result<()> {
+        let (mut store, mut instance) = instantiate(wasm, ctx, add_imports)?;
         let t = test::Test::new(&mut store, &mut instance, |host| {
             host.test_data.as_mut().unwrap()
         })?;
@@ -54,13 +136,7 @@ mod tests {
         Ok(())
     }
 
-    struct Context<T> {
-        wasi: WasiCtx,
-        runtime_data: Option<T>,
-        test_data: Option<test::TestData>,
-    }
-
-    fn instantiate<T>(
+    pub fn instantiate<T>(
         wasm: &str,
         ctx: Context<T>,
         add_imports: impl FnOnce(&mut Linker<Context<T>>) -> Result<()>,
@@ -77,14 +153,20 @@ mod tests {
         Ok((store, instance))
     }
 
-    fn default_config() -> Result<Config> {
+    pub fn default_config() -> Result<Config> {
         let mut config = Config::new();
         config.cache_config_load_default()?;
         config.wasm_backtrace_details(wasmtime::WasmBacktraceDetails::Enable);
         Ok(config)
     }
 
-    fn default_wasi() -> WasiCtx {
+    pub fn default_wasi() -> WasiCtx {
         WasiCtxBuilder::new().inherit_stdio().build()
+    }
+
+    pub struct Context<T> {
+        pub wasi: WasiCtx,
+        pub runtime_data: Option<T>,
+        pub test_data: Option<test::TestData>,
     }
 }

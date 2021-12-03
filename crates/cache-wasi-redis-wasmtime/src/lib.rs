@@ -5,6 +5,8 @@ use redis::{Client, Commands};
 use std::sync::Arc;
 use wasi_cache::*;
 
+pub use wasi_cache::add_to_linker;
+
 wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_cache.wit");
 
 /// Redis implementation for the WASI cache interface.

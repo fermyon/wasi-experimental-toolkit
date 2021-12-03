@@ -11,10 +11,12 @@
 
 
 [dev-dependencies]
-    anyhow               = "1.0"
-    http-wasi-wasmtime   = { path = "crates/http-wasi-wasmtime" }
-    wasmtime             = "0.31"
-    wasmtime-wasi        = "0.31"
-    wasi-common          = "0.31"
-    wasi-cap-std-sync    = "0.31"
-    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }
+    anyhow                    = "1.0"
+    cache-wasi-redis-wasmtime = { path = "crates/cache-wasi-redis-wasmtime" }
+    http-wasi-wasmtime        = { path = "crates/http-wasi-wasmtime" }
+    tokio                     = { version = "1.4.0", features = [ "full" ] }
+    wasmtime                  = "0.31"
+    wasmtime-wasi             = "0.31"
+    wasi-common               = "0.31"
+    wasi-cap-std-sync         = "0.31"
+    wit-bindgen-wasmtime      = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }
