@@ -19,14 +19,14 @@ fn main() {
     println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
     println!("cargo:rerun-if-changed={}/src/lib.rs", HTTP_RUST_TEST);
 
+    check_tools();
+
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
     cargo_wasi_build(HTTP_RUST_TEST);
     cargo_wasi_build(CACHE_RUST_TEST);
 
     wasi_sdk_make(CACHE_CPP_TEST);
-
-    check_tools();
 }
 
 fn cargo_wasi_build(dir: &str) {
