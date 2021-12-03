@@ -1,16 +1,50 @@
 use futures::executor::block_on;
 use http::HeaderMap;
-use outbound_http::*;
 use reqwest::{Client, Url};
 use std::str::FromStr;
 use tokio::runtime::Handle;
+use wasi_outbound_http::*;
 
-wit_bindgen_wasmtime::export!("wit/ephemeral/outbound_http.wit");
+wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_outbound_http.wit");
 
-struct OutboundHttp {}
+/// A very simple implementation for outbound HTTP requests.
+pub struct OutboundHttp {
+    /// List of hosts guest modules are allowed to make requests to.
+    pub allowed_hosts: Option<Vec<String>>,
+}
 
-impl outbound_http::OutboundHttp for OutboundHttp {
-    fn request(&mut self, req: Request<'_>) -> Result<Response, HttpError> {
+impl OutboundHttp {
+    pub fn new(allowed_hosts: Option<Vec<String>>) -> Self {
+        Self { allowed_hosts }
+    }
+
+    /// Check if guest module is allowed to send request to URL, based on the list of
+    /// allowed hosts defined by the runtime.
+    /// If `None` is passed, the guest module is not allowed to send the request.
+    fn is_allowed(url: &str, allowed_hosts: Option<Vec<String>>) -> Result<bool, HttpError> {
+        let url_host = Url::parse(url)
+            .map_err(|_| HttpError::InvalidUrl)?
+            .host_str()
+            .ok_or(HttpError::InvalidUrl)?
+            .to_owned();
+        match allowed_hosts {
+            Some(domains) => {
+                let allowed: Result<Vec<_>, _> = domains.iter().map(|d| Url::parse(d)).collect();
+                let allowed = allowed.map_err(|_| HttpError::InvalidUrl)?;
+                let a: Vec<&str> = allowed.iter().map(|u| u.host_str().unwrap()).collect();
+                Ok(a.contains(&url_host.as_str()))
+            }
+            None => Ok(false),
+        }
+    }
+}
+
+impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
+    fn request(&mut self, req: Request) -> Result<Response, HttpError> {
+        if !Self::is_allowed(&req.uri, self.allowed_hosts.clone())? {
+            return Err(HttpError::DestinationNotAllowed);
+        }
+
         let method = http::Method::from(req.method);
         let url = Url::parse(req.uri).map_err(|_| HttpError::InvalidUrl)?;
         let headers = headers(req.headers)?;
