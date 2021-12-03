@@ -1,0 +1,13 @@
+[package]
+    name    = "http-rust-hello"
+    version = "0.1.0"
+    edition = "2021"
+    authors = [ "Radu Matei <radu.matei@fermyon.com>" ]
+
+[lib]
+    crate-type = [ "cdylib" ]
+
+[dependencies]
+    wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }
+
+[workspace]

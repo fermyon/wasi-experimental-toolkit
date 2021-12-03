@@ -1,0 +1,7 @@
+enum error {
+    success,
+    failure
+}
+
+// Function to simplify instantiating and executing tests.
+test: function() -> expected<_, error>

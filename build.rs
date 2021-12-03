@@ -11,11 +11,15 @@ const WIT_DIRECTORY: &str = "wit/ephemeral/*";
 const CACHE_FS: &str = "crates/cache-wasi-fs";
 const CACHE_AZURE: &str = "crates/cache-wasi-azure-blobstorage";
 
+const HTTP_RUST_TEST: &str = "tests/modules/http-rust-hello";
+
 fn main() {
     println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
+    println!("cargo:rerun-if-changed={}/src/lib.rs", HTTP_RUST_TEST);
 
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
+    cargo_wasi_build(HTTP_RUST_TEST);
 
     check_tools();
 }

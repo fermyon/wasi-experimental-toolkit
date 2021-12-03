@@ -1,33 +1,37 @@
 use futures::executor::block_on;
 use http::HeaderMap;
 use reqwest::{Client, Url};
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 use tokio::runtime::Handle;
 use wasi_outbound_http::*;
+
+pub use wasi_outbound_http::add_to_linker;
 
 wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_outbound_http.wit");
 
 /// A very simple implementation for outbound HTTP requests.
+#[derive(Default)]
 pub struct OutboundHttp {
     /// List of hosts guest modules are allowed to make requests to.
-    pub allowed_hosts: Option<Vec<String>>,
+    pub allowed_hosts: Arc<Option<Vec<String>>>,
 }
 
 impl OutboundHttp {
     pub fn new(allowed_hosts: Option<Vec<String>>) -> Self {
+        let allowed_hosts = Arc::new(allowed_hosts);
         Self { allowed_hosts }
     }
 
     /// Check if guest module is allowed to send request to URL, based on the list of
     /// allowed hosts defined by the runtime.
     /// If `None` is passed, the guest module is not allowed to send the request.
-    fn is_allowed(url: &str, allowed_hosts: Option<Vec<String>>) -> Result<bool, HttpError> {
+    fn is_allowed(url: &str, allowed_hosts: Arc<Option<Vec<String>>>) -> Result<bool, HttpError> {
         let url_host = Url::parse(url)
             .map_err(|_| HttpError::InvalidUrl)?
             .host_str()
             .ok_or(HttpError::InvalidUrl)?
             .to_owned();
-        match allowed_hosts {
+        match allowed_hosts.as_deref() {
             Some(domains) => {
                 let allowed: Result<Vec<_>, _> = domains.iter().map(|d| Url::parse(d)).collect();
                 let allowed = allowed.map_err(|_| HttpError::InvalidUrl)?;
@@ -49,6 +53,9 @@ impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
         let url = Url::parse(req.uri).map_err(|_| HttpError::InvalidUrl)?;
         let headers = headers(req.headers)?;
         let body = req.body.unwrap_or_default().to_vec();
+
+        // TODO (@radu-matei)
+        // Ensure all  HTTP request and response objects are handled properly (query parameters, headers).
 
         match Handle::try_current() {
             // If running in a Tokio runtime, spawn a new blocking executor
