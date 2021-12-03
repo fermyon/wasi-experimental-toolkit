@@ -25,7 +25,10 @@ impl wasi_cache::WasiCache for WasiCache {
 
     /// Get the payload stored in the cache for the given key.
     fn get(key: String) -> Result<Payload, Error> {
-        let mut file = File::create(path(&key)?)?;
+        let mut file = match File::open(path(&key)?) {
+            Ok(f) => f,
+            Err(_) => return Ok(Vec::new()),
+        };
 
         let mut buf = Vec::new();
         file.read_to_end(&mut buf)?;
