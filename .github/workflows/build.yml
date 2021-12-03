@@ -25,7 +25,7 @@ jobs:
           rustup target add wasm32-unknown-unknown
 
       - name: "Install Redis"
-      - uses: shogo82148/actions-setup-redis@v1
+        uses: shogo82148/actions-setup-redis@v1
         with:
           redis-version: '6.2'
           auto-start: "false"
