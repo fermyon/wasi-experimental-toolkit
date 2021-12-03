@@ -63,6 +63,25 @@ pub async fn read_blob(
     ))
 }
 
+/// Remove the blob given the storage account, access, container, and blob name.
+pub async fn delete_blob(
+    blob: String,
+    config: &Config,
+    http_client: Arc<Box<dyn HttpClient>>,
+) -> Result<()> {
+    let blob_client = StorageAccountClient::new_access_key(
+        http_client.clone(),
+        &config.storage_account,
+        &config.storage_account_key,
+    )
+    .as_storage_client()
+    .as_container_client(&config.container)
+    .as_blob_client(blob);
+
+    blob_client.delete().execute().await?;
+    Ok(())
+}
+
 /// Configuration for accessing a storage account and container.
 pub struct Config {
     /// The storage account name.

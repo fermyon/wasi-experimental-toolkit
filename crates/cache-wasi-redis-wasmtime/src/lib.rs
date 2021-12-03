@@ -1,21 +1,22 @@
 //! Impement the WASI cache interface using a Redis instance.
 //! This is using a Wasmtime host implementation.
 
-use cache::*;
 use redis::{Client, Commands};
+use std::sync::Arc;
+use wasi_cache::*;
 
-wit_bindgen_wasmtime::export!("wit/ephemeral/cache.wit");
+wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_cache.wit");
 
 /// Redis implementation for the WASI cache interface.
-pub struct Cache {
+pub struct RedisCache {
     /// The address of the Redis instance.
     pub address: String,
 
     /// The Redis client.
-    client: Client,
+    client: Arc<Client>,
 }
 
-impl cache::Cache for Cache {
+impl wasi_cache::WasiCache for RedisCache {
     /// Set the payload for the given key.
     /// If provided, the time-to-live argument (in seconds) will be used to set the expiration time.
     fn set(&mut self, key: &str, value: PayloadParam<'_>, ttl: Option<u32>) -> Result<(), Error> {
@@ -27,13 +28,18 @@ impl cache::Cache for Cache {
     fn get(&mut self, key: &str) -> Result<PayloadResult, Error> {
         Ok(self.get(key)?)
     }
+
+    /// Delete the entry for the given key.
+    fn delete(&mut self, key: &str) -> Result<(), Error> {
+        Ok(self.delete(key)?)
+    }
 }
 
-impl Cache {
+impl RedisCache {
     /// Create a new instance for the cache.
     pub fn new(addr: &str) -> anyhow::Result<Self> {
-        let client = Client::open(addr)?;
-        Ok(Cache {
+        let client = Arc::new(Client::open(addr)?);
+        Ok(RedisCache {
             address: addr.to_string(),
             client,
         })
@@ -57,6 +63,14 @@ impl Cache {
         let res: Vec<u8> = conn.get(key)?;
 
         Ok(res)
+    }
+
+    /// Delete the entry for the given key stored in Redis.
+    pub fn delete(&mut self, key: &str) -> anyhow::Result<()> {
+        let mut conn = self.client.get_connection()?;
+        conn.del(key)?;
+
+        Ok(())
     }
 }
 

@@ -10,3 +10,6 @@ set: function(key: string, value: payload, ttl: option<u32>) -> expected<_, erro
 // Get the payload stored in the cache for the given key.
 // If not found, return a success result with an empty payload.
 get: function(key: string) -> expected<payload, error>
+
+/// Delete the cache entry for the given key.
+delete: function(key: string) -> expected<_, error>

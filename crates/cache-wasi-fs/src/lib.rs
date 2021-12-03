@@ -2,18 +2,18 @@
 
 #![deny(missing_docs)]
 
-use cache::*;
 use std::{
     fs::File,
     io::{Read, Write},
     path::PathBuf,
 };
-wit_bindgen_rust::export!("../../wit/ephemeral/cache.wit");
+use wasi_cache::*;
+wit_bindgen_rust::export!("../../wit/ephemeral/wasi_cache.wit");
 
 /// The WASI filesystem implementation for the cache interface.
-struct Cache {}
+struct WasiCache {}
 
-impl cache::Cache for Cache {
+impl wasi_cache::WasiCache for WasiCache {
     /// Set the payload for the given key.
     /// This implementation ignores the time-to-live argument, as it stores the
     /// payloads as files.
@@ -30,6 +30,12 @@ impl cache::Cache for Cache {
         let mut buf = Vec::new();
         file.read_to_end(&mut buf)?;
         Ok(buf)
+    }
+
+    /// Remove the file for the given key.
+    fn delete(key: String) -> Result<(), Error> {
+        std::fs::remove_file(path(&key)?)?;
+        Ok(())
     }
 }
 
