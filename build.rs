@@ -18,6 +18,8 @@ const CACHE_CPP_TEST: &str = "tests/modules/cache-cpp";
 fn main() {
     println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
     println!("cargo:rerun-if-changed={}/src/lib.rs", HTTP_RUST_TEST);
+    println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_AZURE);
+    println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_FS);
 
     check_tools();
 
@@ -27,6 +29,9 @@ fn main() {
     cargo_wasi_build(CACHE_RUST_TEST);
 
     wasi_sdk_make(CACHE_CPP_TEST);
+
+    make_link(CACHE_RUST_TEST);
+    make_link(CACHE_CPP_TEST);
 }
 
 fn cargo_wasi_build(dir: &str) {
@@ -39,6 +44,10 @@ fn cargo_wasi_build(dir: &str) {
 
 fn wasi_sdk_make(dir: &str) {
     run(vec!["make", "bindgen", "build"], Some(dir), None)
+}
+
+fn make_link(dir: &str) {
+    run(vec!["make", "link"], Some(dir), None)
 }
 
 fn check_tools() {

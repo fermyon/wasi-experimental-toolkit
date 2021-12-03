@@ -13,6 +13,8 @@
 [dev-dependencies]
     anyhow                      = "1.0"
     cache-wasi-redis-wasmtime   = { path = "crates/cache-redis-wasmtime" }
+    env_logger                  = "0.9"
+    log                         = { version = "0.4", default-features = false }
     wasi-outbound-http-wasmtime = { path = "crates/http-wasmtime" }
     tokio                       = { version = "1.4.0", features = [ "full" ] }
     wasmtime                    = "0.31"
