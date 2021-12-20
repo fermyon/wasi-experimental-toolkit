@@ -52,7 +52,7 @@ impl RedisCache {
     }
 
     /// Set the payload in Redis using the given key and optional time-to-live (in seconds).
-    pub fn set(&mut self, key: &str, value: &[u8], ttl: Option<u32>) -> anyhow::Result<()> {
+    fn set(&mut self, key: &str, value: &[u8], ttl: Option<u32>) -> anyhow::Result<()> {
         let mut conn = self.client.get_connection()?;
         conn.set(key, value)?;
         match ttl {
@@ -64,7 +64,7 @@ impl RedisCache {
     }
 
     /// Get the payload stored in Redis using the given key.
-    pub fn get(&mut self, key: &str) -> anyhow::Result<Vec<u8>> {
+    fn get(&mut self, key: &str) -> anyhow::Result<Vec<u8>> {
         let mut conn = self.client.get_connection()?;
         let res: Vec<u8> = conn.get(key)?;
 
@@ -72,7 +72,7 @@ impl RedisCache {
     }
 
     /// Delete the entry for the given key stored in Redis.
-    pub fn delete(&mut self, key: &str) -> anyhow::Result<()> {
+    fn delete(&mut self, key: &str) -> anyhow::Result<()> {
         let mut conn = self.client.get_connection()?;
         conn.del(key)?;
 

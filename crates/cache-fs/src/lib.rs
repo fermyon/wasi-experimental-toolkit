@@ -1,4 +1,4 @@
-//! Impement the WASI cache interface using the filesystem API.
+//! Implement the WASI cache interface using the filesystem API.
 
 #![deny(missing_docs)]
 

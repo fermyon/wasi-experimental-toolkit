@@ -63,7 +63,6 @@ mod cache_tests {
 
         let redis = RedisTestController::new().await?;
         let data = Some(RedisCache::new(&redis.address)?);
-
         let add_imports = |linker: &mut Linker<Context<_>>| {
             cache_wasi_redis_wasmtime::add_to_linker(linker, |ctx| -> &mut RedisCache {
                 ctx.runtime_data.as_mut().unwrap()
@@ -143,7 +142,6 @@ mod runtime {
 
     pub fn exec_with_default_imports<T>(wasm: &str, runtime_data: Option<T>) -> Result<()> {
         let ctx = build_ctx(runtime_data);
-
         let (store, instance) = instantiate_with_default_imports(wasm, ctx)?;
         exec_core(store, instance)
     }
@@ -153,9 +151,7 @@ mod runtime {
         ctx: Context<T>,
     ) -> Result<(Store<Context<T>>, Instance)> {
         let (_, module, linker, mut store) = emls(wasm, ctx)?;
-
         let instance = linker.instantiate(&mut store, &module)?;
-
         Ok((store, instance))
     }
 
@@ -165,7 +161,6 @@ mod runtime {
         add_imports: impl FnOnce(&mut Linker<Context<T>>) -> Result<()>,
     ) -> Result<()> {
         let ctx = build_ctx(runtime_data);
-
         let (store, instance) = instantiate(wasm, ctx, add_imports)?;
         exec_core(store, instance)
     }
@@ -176,11 +171,8 @@ mod runtime {
         add_imports: impl FnOnce(&mut Linker<Context<T>>) -> Result<()>,
     ) -> Result<(Store<Context<T>>, Instance)> {
         let (_, module, mut linker, mut store) = emls(wasm, ctx)?;
-
         add_imports(&mut linker)?;
-
         let instance = linker.instantiate(&mut store, &module)?;
-
         Ok((store, instance))
     }
 
@@ -192,9 +184,7 @@ mod runtime {
         let module = Module::from_file(&engine, wasm)?;
         let mut linker = Linker::new(&engine);
         wasmtime_wasi::add_to_linker(&mut linker, |cx: &mut Context<T>| &mut cx.wasi)?;
-
         let store = Store::new(&engine, ctx);
-
         Ok((engine, module, linker, store))
     }
 
@@ -202,9 +192,7 @@ mod runtime {
         let t = test::Test::new(&mut store, &mut instance, |host| {
             host.test_data.as_mut().unwrap()
         })?;
-
         let _ = t.test(&mut store).expect("Error running the test method");
-
         Ok(())
     }
 

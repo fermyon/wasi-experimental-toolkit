@@ -17,8 +17,8 @@
     log                         = { version = "0.4", default-features = false }
     wasi-outbound-http-wasmtime = { path = "crates/http-wasmtime" }
     tokio                       = { version = "1.4.0", features = [ "full" ] }
-    wasmtime                    = "0.31"
-    wasmtime-wasi               = "0.31"
-    wasi-common                 = "0.31"
-    wasi-cap-std-sync           = "0.31"
-    wit-bindgen-wasmtime        = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }
+    wasmtime                    = "0.32"
+    wasmtime-wasi               = "0.32"
+    wasi-common                 = "0.32"
+    wasi-cap-std-sync           = "0.32"
+    wit-bindgen-wasmtime        = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "24c102fe374b4c5698cfd4b7980f70ac2cf228fe" }

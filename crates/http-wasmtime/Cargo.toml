@@ -15,4 +15,4 @@
     reqwest              = { version = "0.11", default-features = true, features = [ "json", "blocking" ] }
     tokio                = { version = "1.4.0", features = [ "full" ] }
     url                  = "2.2.1"
-    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "32e63116d469d8046727fae3c1333a7d35d0c5d3" }
+    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "24c102fe374b4c5698cfd4b7980f70ac2cf228fe" }

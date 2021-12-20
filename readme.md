@@ -1,5 +1,11 @@
 # WASI Experimental Toolkit
 
-The goal of this proposal is to define community interfaces for commonly used
-interfaces from WASI applications, such as object storages, caches, or key-value
-stores.
+The goal of this proposal is to standardize the interfaces for functionality
+commonly used from WebAssembly modules, particularly running in non-browser
+environments.
+
+Interfaces:
+
+- caching
+- logging
+- outbound HTTP

@@ -3,3 +3,4 @@ Cargo.lock
 *.o
 *.wasm
 cache
+.idea
