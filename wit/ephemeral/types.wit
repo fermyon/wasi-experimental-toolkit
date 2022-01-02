@@ -1,7 +1,4 @@
 // General purpose error.
-
-// TODO (@radu-matei)
-// Ideally, we could attach a message to errors.
 enum error {
     success,
     error,

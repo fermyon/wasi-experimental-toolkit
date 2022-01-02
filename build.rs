@@ -4,7 +4,7 @@ use std::{
 };
 
 const WIT_BINDGEN_REPO: &str = "https://github.com/bytecodealliance/wit-bindgen";
-const WIT_BINDGEN_REVISION: &str = "24c102fe374b4c5698cfd4b7980f70ac2cf228fe";
+const WIT_BINDGEN_REVISION: &str = "dab589f579b980c81b39c8348400b88a8c4d175a";
 
 const WIT_DIRECTORY: &str = "wit/ephemeral/*";
 

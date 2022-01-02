@@ -8,7 +8,7 @@ use std::{
     path::PathBuf,
 };
 use wasi_cache::*;
-wit_bindgen_rust::export!("../../wit/ephemeral/wasi_cache.wit");
+wit_bindgen_rust::export!("../../wit/ephemeral/wasi-cache.wit");
 
 /// The WASI filesystem implementation for the cache interface.
 struct WasiCache {}

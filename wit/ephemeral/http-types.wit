@@ -5,7 +5,7 @@
 // This is currently an unsigned 16-bit integer,
 // but it could be represented as an enum containing
 // all possible HTTP status codes.
-type http_status = u16
+type http-status = u16
 
 // The HTTP body.
 // Currently, this is a synchonous byte array, but it should be
@@ -43,16 +43,16 @@ record request {
 
 // An HTTP response.
 record response {
-    status: http_status,
+    status: http-status,
     headers: option<headers>,
     body: option<body>,
 }
 
 // HTTP errors returned by the runtime.
-enum http_error {
+enum http-error {
     success,
-    destination_not_allowed,
-    invalid_url,
-    request_error,
-    runtime_error,
+    destination-not-allowed,
+    invalid-url,
+    request-error,
+    runtime-error,
 }

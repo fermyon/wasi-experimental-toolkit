@@ -4,7 +4,7 @@
 #include <string.h>
 #include <iostream>
 
-#include "bindings/wasi_cache.h"
+#include "bindings/wasi-cache.h"
 #include "bindings/test.h"
 
 test_error_t test_test(void)

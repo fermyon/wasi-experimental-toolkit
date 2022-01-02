@@ -7,7 +7,7 @@ use wasi_cache::*;
 
 pub use wasi_cache::add_to_linker;
 
-wit_bindgen_wasmtime::export!("wit/ephemeral/wasi_cache.wit");
+wit_bindgen_wasmtime::export!("wit/ephemeral/wasi-cache.wit");
 
 /// Redis implementation for the WASI cache interface.
 #[derive(Clone)]

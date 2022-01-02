@@ -1,4 +1,4 @@
-wit_bindgen_rust::import!("../../../wit/ephemeral/wasi_cache.wit");
+wit_bindgen_rust::import!("../../../wit/ephemeral/wasi-cache.wit");
 wit_bindgen_rust::export!("../../test.wit");
 
 struct Test {}

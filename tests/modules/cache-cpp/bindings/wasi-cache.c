@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <wasi_cache.h>
+#include <wasi-cache.h>
 
 __attribute__((weak, export_name("canonical_abi_realloc")))
 void *canonical_abi_realloc(
@@ -59,7 +59,7 @@ typedef struct {
   } val;
 } wasi_cache_expected_payload_error_t;
 static int64_t RET_AREA[3];
-__attribute__((import_module("wasi_cache"), import_name("set")))
+__attribute__((import_module("wasi-cache"), import_name("set")))
 void __wasm_import_wasi_cache_set(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
 wasi_cache_error_t wasi_cache_set(wasi_cache_string_t *key, wasi_cache_payload_t *value, wasi_cache_option_u32_t *ttl) {
   int32_t variant;
@@ -92,7 +92,7 @@ wasi_cache_error_t wasi_cache_set(wasi_cache_string_t *key, wasi_cache_payload_t
   }
   return variant2.tag ? variant2.val.err : -1;
 }
-__attribute__((import_module("wasi_cache"), import_name("get")))
+__attribute__((import_module("wasi-cache"), import_name("get")))
 void __wasm_import_wasi_cache_get(int32_t, int32_t, int32_t);
 wasi_cache_error_t wasi_cache_get(wasi_cache_string_t *key, wasi_cache_payload_t *ret0) {
   int32_t ptr = (int32_t) &RET_AREA;
@@ -112,7 +112,7 @@ wasi_cache_error_t wasi_cache_get(wasi_cache_string_t *key, wasi_cache_payload_t
   *ret0 = variant.val.ok;
   return variant.tag ? variant.val.err : -1;
 }
-__attribute__((import_module("wasi_cache"), import_name("delete")))
+__attribute__((import_module("wasi-cache"), import_name("delete")))
 void __wasm_import_wasi_cache_delete(int32_t, int32_t, int32_t);
 wasi_cache_error_t wasi_cache_delete(wasi_cache_string_t *key) {
   int32_t ptr = (int32_t) &RET_AREA;

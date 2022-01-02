@@ -1,6 +1,6 @@
 use wasi_outbound_http::*;
 
-wit_bindgen_rust::import!("../../../wit/ephemeral/wasi_outbound_http.wit");
+wit_bindgen_rust::import!("../../../wit/ephemeral/wasi-outbound-http.wit");
 wit_bindgen_rust::export!("../../test.wit");
 
 struct Test {}
