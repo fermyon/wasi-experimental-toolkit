@@ -1,4 +1,0 @@
-use * from http_types
-
-// Send an HTTP request and return a response or a potential error.
-request: function(req: request) -> expected<response, http_error>
