@@ -22,7 +22,7 @@ impl test::Test for Test {
         println!("Body: {}", body);
 
         assert_eq!(200, res.status);
-        assert_eq!("\"OK\"", body);
+        assert_eq!("", body);
 
         Ok(())
     }
