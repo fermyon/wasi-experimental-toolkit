@@ -127,6 +127,32 @@ mod cache_tests {
     }
 }
 
+#[cfg(test)]
+mod wasi_log_tests {
+    use super::runtime::*;
+    use log_wasmtime::WasiLogger;
+    use anyhow::Result;
+    use wasmtime::Linker;
+
+    const RUST_LOG_TEST: &str =
+    "tests/modules/rust-log/target/wasm32-wasi/release/rust_log.wasm";
+    
+    #[test]
+    fn test_rust_log() -> Result<()> {
+        init();
+        
+        let data = Some(WasiLogger{});
+
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            log_wasmtime::add_to_linker(linker, |ctx| -> &mut WasiLogger {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(RUST_LOG_TEST, data, add_imports)
+    }
+}
+
 mod runtime {
     use anyhow::Result;
     use wasi_cap_std_sync::WasiCtxBuilder;
