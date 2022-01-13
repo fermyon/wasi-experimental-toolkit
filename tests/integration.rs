@@ -1,3 +1,49 @@
+
+#[cfg(test)]
+mod nn_tests {
+    use super::runtime::*;
+    use anyhow::Result;
+    use wasi_nn_tract_wasmtime::{WasiNnTractCtx, wasi_nn::WasiNnTables};
+    use wasmtime::*;
+
+    const NN_RUST_TEST: &str = "tests/modules/nn-demo/target/wasm32-wasi/release/nn_demo.wasm";
+
+    #[test]
+    fn test_empty_nn() -> Result<()> {
+        
+        type WasiNnTable = WasiNnTables<WasiNnTractCtx>;
+
+        let runtime_data = Some((WasiNnTractCtx::default(), WasiNnTables::<WasiNnTractCtx>::default()));
+        let wasi = default_wasi();
+        let test_data = Some(test::TestData::default());
+        let ctx = Context {
+            wasi,
+            runtime_data,
+            test_data,
+        };
+
+        let add_imports = |linker| {
+            wasi_nn_tract_wasmtime::add_to_linker(linker, |ctx: &mut Context<(WasiNnTractCtx, WasiNnTable)>| -> (&mut WasiNnTractCtx, &mut WasiNnTable) {
+                let ct = ctx.runtime_data.as_mut().unwrap();
+                (&mut ct.0, &mut ct.1)
+            })
+        };
+        let engine = Engine::new(&default_config()?)?;
+        let module = Module::from_file(&engine, NN_RUST_TEST)?;
+        let mut linker = Linker::new(&engine);
+        wasmtime_wasi::add_to_linker(&mut linker, |cx: &mut Context<_>| &mut cx.wasi)?;
+        let mut store = Store::new(&engine, ctx);
+        
+        add_imports(&mut linker)?;
+        let mut instance = linker.instantiate(&mut store, &module)?;
+        let t = test::Test::new(&mut store, &mut instance, |host| {
+            host.test_data.as_mut().unwrap()
+        })?;
+        let _ = t.test(&mut store).expect("Error running the test method");
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod http_tests {
     use super::runtime::*;
@@ -17,7 +63,7 @@ mod http_tests {
         let add_imports = |linker: &mut Linker<Context<_>>| {
             wasi_outbound_http_wasmtime::add_to_linker(linker, |ctx| -> &mut OutboundHttp {
                 ctx.runtime_data.as_mut().unwrap()
-            })
+            })        
         };
 
         exec(HTTP_RUST_TEST, data, add_imports)
@@ -124,6 +170,32 @@ mod cache_tests {
             .local_addr()
             .unwrap()
             .port()
+    }
+}
+
+#[cfg(test)]
+mod wasi_log_tests {
+    use super::runtime::*;
+    use log_wasmtime::WasiLogger;
+    use anyhow::Result;
+    use wasmtime::Linker;
+
+    const RUST_LOG_TEST: &str =
+    "tests/modules/rust-log/target/wasm32-wasi/release/rust_log.wasm";
+    
+    #[test]
+    fn test_rust_log() -> Result<()> {
+        init();
+        
+        let data = Some(WasiLogger{});
+
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            log_wasmtime::add_to_linker(linker, |ctx| -> &mut WasiLogger {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(RUST_LOG_TEST, data, add_imports)
     }
 }
 
