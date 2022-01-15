@@ -1,4 +1,5 @@
 // wasi-parallel
+// Adapted from https://github.com/WebAssembly/wasi-parallel.
 // This module exposes a system's ability to run parallel looping constructs. It is designed for
 // use on both CPU and non-CPU devices (e.g., GPU).
 
@@ -33,7 +34,7 @@ enum device-kind {
 // The kernel to run in parallel.
 // TODO: It is unclear how to represent this as a `funcref`, which
 // itself may not be the final mechanism for identifying which kernel to run.
-type fn = string
+type func = string
 
 // Error codes returned by functions in this API.
 enum error {
@@ -57,4 +58,4 @@ read-buffer: function(buffer: buffer, data: buffer-data) -> expected<_, error>
 
 // Run a function in parallel--a "parallel for" mechanism.
 // TODO: perhaps return the output buffers instead of a mutable argument?
-parallel-for: function(worker: fn, num-threads: u32, block-size: u32, in-buffers: list<buffer>, out-buffers: list<buffer>) -> expected<_, error>
+parallel-for: function(worker: func, num-threads: u32, block-size: u32, in-buffers: list<buffer>, out-buffers: list<buffer>) -> expected<_, error>
