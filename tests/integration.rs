@@ -39,6 +39,33 @@ mod http_tests {
 }
 
 #[cfg(test)]
+mod mongo_tests {
+    use super::runtime::*;
+    use anyhow::Result;
+    use mongo_wasmtime::WasiMongoClient;
+    use wasmtime::Linker;
+
+    const MONGO_RUST_TEST: &str =
+    "tests/modules/rust-mongo/target/wasm32-wasi/release/rust_mongo.wasm";
+    const MONGO_SERVER_ADDR: &str = "mongodb://localhost:27017";
+    
+    #[test]
+    fn test_mongo_collection_exists() -> Result<()> {
+        init();
+
+        let client = WasiMongoClient::new(MONGO_SERVER_ADDR)?;
+        let data = Some(client);
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            mongo_wasmtime::add_to_linker(linker, |ctx| -> &mut WasiMongoClient {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(MONGO_RUST_TEST, data, add_imports)
+    }
+}
+
+#[cfg(test)]
 mod cache_tests {
     use super::runtime::*;
     use anyhow::Result;

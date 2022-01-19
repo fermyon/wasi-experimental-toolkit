@@ -1,0 +1,4 @@
+
+use * from types
+
+collection-exists: function(db: string, name: string) -> expected<bool, error>
