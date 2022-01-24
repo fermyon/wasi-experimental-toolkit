@@ -44,7 +44,11 @@ impl OutboundHttp {
 }
 
 impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
-    fn request(&mut self, req: Request) -> Result<Response, HttpError> {
+    fn request(
+        &mut self,
+        req: Request,
+        config: Option<RequestConfig>,
+    ) -> Result<Response, HttpError> {
         if !Self::is_allowed(&req.uri, self.allowed_hosts.clone())? {
             return Err(HttpError::DestinationNotAllowed);
         }
