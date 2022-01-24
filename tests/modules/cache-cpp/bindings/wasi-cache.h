@@ -16,7 +16,6 @@ extern "C"
   void wasi_cache_string_set(wasi_cache_string_t *ret, const char *s);
   void wasi_cache_string_dup(wasi_cache_string_t *ret, const char *s);
   void wasi_cache_string_free(wasi_cache_string_t *ret);
-  // General purpose error.
   typedef uint8_t wasi_cache_error_t;
   #define WASI_CACHE_ERROR_SUCCESS 0
   #define WASI_CACHE_ERROR_ERROR 1
