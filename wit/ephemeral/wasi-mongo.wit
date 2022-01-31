@@ -1,4 +1,13 @@
 
 use * from types
 
-collection-exists: function(db: string, name: string) -> expected<bool, error>
+type document = list<u8> 
+
+// Create a new collection in the database
+create-collection: function(db: string, name: string) -> expected<_, error>
+
+// Insert a document into a collection 
+insert-one-document: function(db: string, collection: string, id: string, doc: document) -> expected<string, error>
+
+// Get a document from the collection
+get-document: function(db: string, collection: string, name: string) -> expected<document, error>
