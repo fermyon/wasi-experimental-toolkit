@@ -1,8 +1,13 @@
 # WASI Experimental Toolkit
 
-The goal of this proposal is to standardize the interfaces for functionality
+<div align="center">
+  <h1>WASI Experimental Toolkit</h1>
+  <img src="./docs/images/wasi-toolkit.png" width="300"/>
+  <p>The goal of this proposal is to standardize the interfaces for functionality
 commonly used from WebAssembly modules, particularly running in non-browser
 environments.
+  </p>
+</div>
 
 Interfaces:
 
