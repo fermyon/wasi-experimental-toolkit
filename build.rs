@@ -34,6 +34,7 @@ fn main() {
     cargo_wasi_build(LOG_RUST_TEST);
     cargo_wasi_build(NN_TEST);
 
+
     wasi_sdk_make(CACHE_CPP_TEST);
 
     make_link(CACHE_RUST_TEST);
