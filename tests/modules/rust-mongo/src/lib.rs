@@ -19,8 +19,10 @@ struct Person {
 
 impl test::Test for Test {
     fn test() -> Result<(), test::Error> {
+        println!("Creating a new collection {} in database {}", TEST_COLLECTION_NAME, TEST_DB_NAME);
         wasi_mongo::create_collection(TEST_DB_NAME, TEST_COLLECTION_NAME)?;
-        
+        println!("Collection created");
+
         let person = Person {
             name: "John".to_string(),
             age: 30,
@@ -29,9 +31,12 @@ impl test::Test for Test {
         
         // Serialize it to a JSON string.
         let doc = serde_json::to_vec(&person).unwrap();
-        
+
+        println!("Inserting document {} into collection {} in database {}", TEST_DOCUMENT_ID, TEST_COLLECTION_NAME, TEST_DB_NAME);
         wasi_mongo::insert_one_document(TEST_DB_NAME, TEST_COLLECTION_NAME, TEST_DOCUMENT_ID, &doc)?;
-        
+        println!("Document inserted");
+
+        println!("Finding document {} in collection {} in database {}", TEST_DOCUMENT_ID, TEST_COLLECTION_NAME, TEST_DB_NAME);
         wasi_mongo::find_document(TEST_DB_NAME, TEST_COLLECTION_NAME, TEST_DOCUMENT_ID)
             .map(|res| {
                 let out: Person = serde_json::from_slice::<Person>(&res).unwrap();
@@ -41,6 +46,10 @@ impl test::Test for Test {
                 println!("{:?}", err);
             });
 
+        println!("Dropping database {}", TEST_DB_NAME);
+        wasi_mongo::drop_database(TEST_DB_NAME)?;
+        println!("Database dropped");
+        
         Ok(())
     }
 }

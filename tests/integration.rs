@@ -130,7 +130,7 @@ mod cache_tests {
                 .args(&["--port", port.to_string().as_str()])
                 .spawn()?;
 
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(4)).await;
 
             Ok(Self {
                 address,

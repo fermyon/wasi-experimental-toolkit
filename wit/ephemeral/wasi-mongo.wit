@@ -19,4 +19,4 @@ find-document: function(db: string, collection: string, name: string) -> expecte
 // Delete operations
 
 // Drop the database
-// drop-database: function(db: string) -> expected<_, error>
+drop-database: function(db: string) -> expected<_, error>

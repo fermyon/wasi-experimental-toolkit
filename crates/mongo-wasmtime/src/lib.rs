@@ -8,9 +8,10 @@ use std::sync::Arc;
 
 use mongodb::{
     sync::{Client,Database,Collection},
-    options::CreateCollectionOptions, bson::{Bson, document::Values, oid::ObjectId, doc}, results::InsertOneResult,
+    bson::doc,
+    results::InsertOneResult,
+    options::CreateCollectionOptions
 };
-
 
 use serde_json::{
     Value,
@@ -36,7 +37,6 @@ impl wasi_mongo::WasiMongo for WasiMongoClient {
     fn insert_one_document(&mut self, db: &str, collection: &str, id: &str, document: wasi_mongo::DocumentParam) -> Result<String, Error> {
         match self.mongo_insert_one_document(db, collection, id, document) {
             Ok(res) => {
-                println!("{:?}", res);
                 return Ok(res.inserted_id.as_str().ok_or(Error::Error)?.to_string());
             },
             Err(_) => Err(Error::Error),
@@ -46,6 +46,11 @@ impl wasi_mongo::WasiMongo for WasiMongoClient {
     fn find_document(&mut self, db: &str, collection: &str, name: &str) -> Result<wasi_mongo::DocumentResult, Error> {
         let res = self.mongo_find_document(db, collection, name)?;
         Ok(res)
+    }
+
+    fn drop_database(&mut self, db: &str) -> Result<(), Error> {
+        self.mongo_drop_database(db)?;
+        Ok(())
     }
 }
 
@@ -87,7 +92,13 @@ impl WasiMongoClient {
 
         let obj: Map<String, Value> = collection.find_one(doc! {"_id": name}, None)?.unwrap();
         let res: wasi_mongo::DocumentResult = serde_json::to_string(&obj)?.into();
-        Ok(res.into())
+        Ok(res)
+    }
+
+    fn mongo_drop_database(&mut self, db: &str) -> anyhow::Result<()> {
+        let database = self.database(db)?;
+        database.drop(None)?;
+        Ok(())
     }
 }
 
