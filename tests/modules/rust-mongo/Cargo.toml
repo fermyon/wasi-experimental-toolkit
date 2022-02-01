@@ -10,5 +10,7 @@ authors = [ "Nitish Malhotra <nitishm@microsoft.com>" ]
 
 [dependencies]
     wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "2e654dc82b7f9331719ba617a36ed5967b2aecb0" }
+    serde_json       = "1.0.75"
+    serde            = { version = "1.0.136", features = ["derive"] }
 
 [workspace]

@@ -50,7 +50,7 @@ mod mongo_tests {
     const MONGO_SERVER_ADDR: &str = "mongodb://localhost:27017";
     
     #[test]
-    fn test_mongo_collection() -> Result<()> {
+    fn test_mongo_create_insert_find_collection() -> Result<()> {
         init();
 
         let client = WasiMongoClient::new(MONGO_SERVER_ADDR)?;

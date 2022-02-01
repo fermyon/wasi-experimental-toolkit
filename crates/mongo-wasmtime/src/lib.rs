@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use mongodb::{
     sync::{Client,Database,Collection},
-    options::CreateCollectionOptions, bson::{Bson, document::Values, oid::ObjectId}, results::InsertOneResult,
+    options::CreateCollectionOptions, bson::{Bson, document::Values, oid::ObjectId, doc}, results::InsertOneResult,
 };
 
 
@@ -37,15 +37,15 @@ impl wasi_mongo::WasiMongo for WasiMongoClient {
         match self.mongo_insert_one_document(db, collection, id, document) {
             Ok(res) => {
                 println!("{:?}", res);
-                return Ok(res.inserted_id.as_str().ok_or_else(|| Error::Error)?.to_string());
+                return Ok(res.inserted_id.as_str().ok_or(Error::Error)?.to_string());
             },
             Err(_) => Err(Error::Error),
         }
     }
 
-    fn get_document(&mut self, db: &str, collection: &str, name: &str) -> Result<wasi_mongo::DocumentResult, Error> {
-        self.mongo_get_document(db, collection, name)?;
-        Ok(wasi_mongo::DocumentResult::new())
+    fn find_document(&mut self, db: &str, collection: &str, name: &str) -> Result<wasi_mongo::DocumentResult, Error> {
+        let res = self.mongo_find_document(db, collection, name)?;
+        Ok(res)
     }
 }
 
@@ -81,13 +81,13 @@ impl WasiMongoClient {
         Ok(collection.insert_one(obj, None)?)
     }
 
-    fn mongo_get_document(&mut self, db: &str, collection: &str, _name: &str) -> anyhow::Result<wasi_mongo::DocumentResult> {
+    fn mongo_find_document(&mut self, db: &str, collection: &str, name: &str) -> anyhow::Result<wasi_mongo::DocumentResult> {
         let database = self.database(db)?;
-        let _collection: Collection<Map<String, Value>> = database.collection(collection);
+        let collection: Collection<Map<String, Value>> = database.collection(collection);
 
-        // let obj: Map<String, Value> = collection.find_one(doc! {"_id": name}, None)?.unwrap();
-
-        Ok(wasi_mongo::DocumentResult::new())
+        let obj: Map<String, Value> = collection.find_one(doc! {"_id": name}, None)?.unwrap();
+        let res: wasi_mongo::DocumentResult = serde_json::to_string(&obj)?.into();
+        Ok(res.into())
     }
 }
 
