@@ -16,8 +16,8 @@ use tract_onnx::{
     prelude::Graph as TractGraph, prelude::Tensor as TractTensor, prelude::*,
     tract_hir::infer::InferenceOp,
 };
-use wasi_nn::{ExecutionTarget, GraphBuilderArray, GraphEncoding, TensorParam, TensorResult};
 pub use wasi_nn::add_to_linker;
+use wasi_nn::{ExecutionTarget, GraphBuilderArray, GraphEncoding, TensorParam, TensorResult};
 
 wit_bindgen_wasmtime::export!("wit/ephemeral/wasi-nn.wit");
 

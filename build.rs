@@ -28,7 +28,7 @@ fn main() {
 
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
-    
+
     cargo_wasi_build(HTTP_RUST_TEST);
     cargo_wasi_build(CACHE_RUST_TEST);
     cargo_wasi_build(LOG_RUST_TEST);

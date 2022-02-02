@@ -13,27 +13,27 @@ impl wasi_log::WasiLog for WasiLogger {
         log::log!(lvl.into(), "{}", msg);
     }
 
-    fn trace(&mut self,msg: &str) {
+    fn trace(&mut self, msg: &str) {
         log::trace!("{}", msg);
     }
-    
-    fn debug(&mut self,msg: &str) {
+
+    fn debug(&mut self, msg: &str) {
         log::debug!("{}", msg);
     }
-    
-    fn info(&mut self,msg: &str) {
+
+    fn info(&mut self, msg: &str) {
         log::info!("{}", msg);
     }
-    
-    fn warn(&mut self,msg: &str) {
+
+    fn warn(&mut self, msg: &str) {
         log::warn!("{}", msg);
     }
-    
-    fn error(&mut self,msg: &str) {
+
+    fn error(&mut self, msg: &str) {
         log::error!("{}", msg);
     }
-    
-    fn fatal(&mut self,msg: &str) {
+
+    fn fatal(&mut self, msg: &str) {
         log::error!("{}", msg);
     }
 }
