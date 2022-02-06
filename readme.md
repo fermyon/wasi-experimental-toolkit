@@ -40,5 +40,5 @@ $ cargo test --all -- --nocapture
   `/opt/wasi-sdk/` (configurable in
   [`Makefile`](tests/modules/cache-cpp/Makefile))
 - [Rust](https://www.rust-lang.org/) at
-  [1.56+](https://www.rust-lang.org/tools/install) with the `wasm32-wasi` target
+  [1.56+](https://www.rust-lang.org/tools/install) with the `wasm32-wasi` and `wasm32-unknown-unknown` targets
   configured
