@@ -1,0 +1,26 @@
+// Simple access to provided environment variables
+// Can also serve as an example project for adding
+// new interfaces
+
+enum env-error {
+    key-not-found,
+    conversion-error,
+}
+
+get-keys: function() -> list<string>
+has-key: function(key: string) -> bool
+
+get: function(key: string) -> expected<string, env-error>
+
+get-u8:  function(key: string) -> expected<u8, env-error>
+get-u16: function(key: string) -> expected<u16, env-error>
+get-u32: function(key: string) -> expected<u32, env-error>
+get-u64: function(key: string) -> expected<u64, env-error>
+
+get-s8:  function(key: string) -> expected<s8, env-error>
+get-s16: function(key: string) -> expected<s16, env-error>
+get-s32: function(key: string) -> expected<s32, env-error>
+get-s64: function(key: string) -> expected<s64, env-error>
+
+get-f32: function(key: string) -> expected<f32, env-error>
+get-f64: function(key: string) -> expected<f64, env-error>

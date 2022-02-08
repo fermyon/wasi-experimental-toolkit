@@ -7,7 +7,7 @@
 [dependencies]
 
 [workspace]
-    members = [ "crates/cache-redis-wasmtime", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime" ]
+    members = [ "crates/cache-redis-wasmtime", "crates/envvars", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime" ]
 
 
 [dev-dependencies]
