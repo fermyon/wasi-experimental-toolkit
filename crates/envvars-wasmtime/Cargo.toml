@@ -1,5 +1,5 @@
 [package]
-    name = "envvars-passthru"
+    name = "envvars-wasmtime"
     version = "0.1.0"
     edition = "2021"
     authors = [ "Scott Lyons <scottalyons@gmail.com>" ]
