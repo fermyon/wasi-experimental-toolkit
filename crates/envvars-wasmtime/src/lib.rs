@@ -15,20 +15,43 @@ pub struct EnvVars {
 }
 
 impl EnvVars {
-    pub fn new() -> EnvVars {
-        EnvVars::from_map(sysenv::vars().collect())
+    /// Builds EnvVars with ALL process environment variables exposed
+    /// 
+    /// All environment keys are internally normalized and are therefore
+    /// case insensitive
+    pub fn new_from_env() -> EnvVars {
+        EnvVars::from_map(sysenv::vars().collect(), |_| true)
     }
 
+    /// Builds EnvVars from process environment variables filtered through the given predicate function
+    /// 
+    /// The predicate function is used AFTER all keys are normalized and lowercased.
+    pub fn new_with_predicate(filter: fn(&(String, String)) -> bool) -> EnvVars {
+        EnvVars::from_map(sysenv::vars().collect(), filter)
+    }
+
+    /// Builds EnvVars from the given HashMap for the utmost control
     pub fn new_from(other: HashMap<String, String>) -> EnvVars {
-        EnvVars::from_map(other)
+        EnvVars::from_map(other, |_| true)
     }
 
-    fn from_map(other: HashMap<String, String>) -> EnvVars {
+    pub fn new_empty() -> EnvVars {
+        EnvVars { env: HashMap::new() }
+    }
+
+    fn from_map(other: HashMap<String, String>, filter: fn(&(String, String)) -> bool) -> EnvVars {
         let the_env = other
             .iter()
-            .map(|(k, v)| (k.to_lowercase(), v.to_lowercase()))
+            .map(|(k, v)| (k.to_lowercase(), v.to_owned()))
+            .filter(filter)
             .collect();
         EnvVars {env: the_env}
+    }
+
+    /// Utility function to modify the environment after creation. Chain it for maximum damage!
+    pub fn with(&mut self, key: &str, value: &str) -> &mut Self {
+        self.env.insert(key.to_lowercase(), value.to_string());
+        self
     }
 
     fn try_get<T>(&mut self, key: &str) -> Result<T, EnvError>
