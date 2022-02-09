@@ -11,8 +11,6 @@ const WIT_DIRECTORY: &str = "wit/ephemeral/*";
 const CACHE_FS: &str = "crates/cache-fs";
 const CACHE_AZURE: &str = "crates/cache-azure-blobstorage";
 
-const ENVVARS: &str = "crates/envvars";
-
 const HTTP_RUST_TEST: &str = "tests/modules/http-rust-hello";
 const NN_TEST: &str = "tests/modules/nn-demo";
 const CACHE_RUST_TEST: &str = "tests/modules/cache-rust";
@@ -27,7 +25,6 @@ fn main() {
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_AZURE);
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_FS);
 
-    println!("cargo:rerun-if-changed={}/src/lib.rs", ENVVARS);
     println!("cargo:rerun-if-changed={}/src/lib.rs", ENVVARS_RUST_TEST);
 
     check_tools();
@@ -35,7 +32,6 @@ fn main() {
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
 
-    cargo_wasi_build(ENVVARS);
     cargo_wasi_build(ENVVARS_RUST_TEST);
 
     cargo_wasi_build(HTTP_RUST_TEST);
@@ -46,7 +42,6 @@ fn main() {
 
     wasi_sdk_make(CACHE_CPP_TEST);
 
-    make_link(ENVVARS_RUST_TEST);
     make_link(CACHE_RUST_TEST);
     make_link(CACHE_CPP_TEST);
 }
