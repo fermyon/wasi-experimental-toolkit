@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <wasi-cache.h>
+#include <wasi_cache.h>
 
 __attribute__((weak, export_name("canonical_abi_realloc")))
 void *canonical_abi_realloc(

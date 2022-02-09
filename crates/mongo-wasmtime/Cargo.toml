@@ -12,3 +12,4 @@
     wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "2e654dc82b7f9331719ba617a36ed5967b2aecb0" }
     mongodb              = { version = "2.1.0", default-features = false, features = [ "sync" ] }
     serde_json           = "1.0.75"
+    serde            = { version = "1.0.136", features = ["derive"] }

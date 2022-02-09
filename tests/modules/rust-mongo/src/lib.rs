@@ -6,7 +6,6 @@ wit_bindgen_rust::export!("../../test.wit");
 
 const TEST_DB_NAME: &str = "db";
 const TEST_COLLECTION_NAME: &str = "collection";
-const TEST_DOCUMENT_ID: &str = "my_id";
 
 struct Test {}
 
@@ -19,32 +18,46 @@ struct Person {
 
 impl test::Test for Test {
     fn test() -> Result<(), test::Error> {
-        println!("Creating a new collection {} in database {}", TEST_COLLECTION_NAME, TEST_DB_NAME);
-        wasi_mongo::create_collection(TEST_DB_NAME, TEST_COLLECTION_NAME)?;
-        println!("Collection created");
-
-        let person = Person {
+        let person_one = Person {
             name: "John".to_string(),
             age: 30,
             city: "London".to_string(),
         };
         
         // Serialize it to a JSON string.
-        let doc = serde_json::to_vec(&person).unwrap();
+        let doc = serde_json::to_vec(&person_one).unwrap();
 
-        println!("Inserting document {} into collection {} in database {}", TEST_DOCUMENT_ID, TEST_COLLECTION_NAME, TEST_DB_NAME);
-        wasi_mongo::insert_one_document(TEST_DB_NAME, TEST_COLLECTION_NAME, TEST_DOCUMENT_ID, &doc)?;
+        println!("Inserting document into collection {} in database {}", TEST_COLLECTION_NAME, TEST_DB_NAME);
+        wasi_mongo::insert_one(TEST_DB_NAME, TEST_COLLECTION_NAME, &doc)?;
         println!("Document inserted");
 
-        println!("Finding document {} in collection {} in database {}", TEST_DOCUMENT_ID, TEST_COLLECTION_NAME, TEST_DB_NAME);
-        wasi_mongo::find_document(TEST_DB_NAME, TEST_COLLECTION_NAME, TEST_DOCUMENT_ID)
-            .map(|res| {
-                let out: Person = serde_json::from_slice::<Person>(&res).unwrap();
-                println!("{:?}", out);
-            })
-            .map_err(|err| {
-                println!("{:?}", err);
-            });
+        let person_two = Person {
+            name: "Marcus".to_string(),
+            age: 35,
+            city: "New York".to_string(),
+        };
+
+        let person_three = Person {
+            name: "Nitish".to_string(),
+            age: 31,
+            city: "San Diego".to_string(),
+        };
+
+        println!("Inserting multiple documents into collection {} in database {}", TEST_COLLECTION_NAME, TEST_DB_NAME);
+        let doc_two: Vec<u8> = serde_json::to_vec(&person_two).unwrap();
+        let doc_three: Vec<u8> = serde_json::to_vec(&person_three).unwrap();
+        let docs: Vec<&[u8]> = vec![&doc_two, &doc_three];
+
+        wasi_mongo::insert_many(TEST_DB_NAME, TEST_COLLECTION_NAME, &docs)?;
+        println!("Documents inserted");
+
+        println!("Finding all documents in collection {} in database {}", TEST_COLLECTION_NAME, TEST_DB_NAME);
+        let res = wasi_mongo::find(TEST_DB_NAME, TEST_COLLECTION_NAME, wasi_mongo::DocumentParam::default())?;
+        
+        for doc in res {
+            let person: Person = serde_json::from_slice(&doc).unwrap();
+            println!("Found document {:?}", person);
+        }
 
         println!("Dropping database {}", TEST_DB_NAME);
         wasi_mongo::drop_database(TEST_DB_NAME)?;

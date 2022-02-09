@@ -5,18 +5,38 @@ type document = list<u8>
 
 // Create operations
 
-// Create a new collection in the database
-create-collection: function(db: string, name: string) -> expected<_, error>
-
 // Insert a document into a collection 
-insert-one-document: function(db: string, collection: string, id: string, doc: document) -> expected<string, error>
+insert-one: function(db: string, collection: string, doc: document) -> expected<_, error>
+
+// Insert many documents into a collection
+insert-many: function(db: string, collection: string, docs: list<document>) -> expected<_, error> 
 
 // Read operations
 
-// Get a document from the collection by name
-find-document: function(db: string, collection: string, name: string) -> expected<document, error>
+// Get a list of documents from the collection
+// TODO (nitishm): Add support for query params
+find: function(db: string, collection: string, filter: document) -> expected<list<document>, error>
+
+// Update operations
+
+// Update one document in the collection
+update-one: function(db: string, collection: string, filter: document, doc: document) -> expected<_, error>
+
+// Update many documents in the collection
+update-many: function(db: string, collection: string, filter: document, docs: list<document>) -> expected<_, error>
+
+// Replace one document in the collection
+replace-one: function(db: string, collection: string, filter: document, doc: document) -> expected<_, error>
 
 // Delete operations
+
+// Delete a document from the collection
+delete-one: function(db: string, collection: string, filter: document) -> expected<_, error>
+
+// Delete many documents from the collection
+delete-many: function(db: string, collection: string, filter: document) -> expected<_, error>
+
+// Drop operations
 
 // Drop the database
 drop-database: function(db: string) -> expected<_, error>
