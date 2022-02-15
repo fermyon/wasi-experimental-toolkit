@@ -31,10 +31,7 @@ $ cargo test --all -- --nocapture
 
 ### Prerequisites
 
-- [Wasmtime](https://github.com/bytecodealliance/wasmtime) at
-  [v0.32](https://github.com/bytecodealliance/wasmtime/releases/tag/v0.32.0)
-- [`wit-bindgen`](https://github.com/bytecodealliance/wit-bindgen) at
-  [24c102fe](https://github.com/bytecodealliance/wit-bindgen/commit/24c102fe374b4c5698cfd4b7980f70ac2cf228fe)
+- Redis installed so that `redis-server` is available
 - [WASI SDK](https://github.com/WebAssembly/wasi-sdk) at
   [v12+](https://github.com/WebAssembly/wasi-sdk/releases/tag/wasi-sdk-14) in
   `/opt/wasi-sdk/` (configurable in
