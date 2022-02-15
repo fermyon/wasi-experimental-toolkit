@@ -36,8 +36,8 @@ mod nn_tests {
         let mut store = Store::new(&engine, ctx);
 
         add_imports(&mut linker)?;
-        let mut instance = linker.instantiate(&mut store, &module)?;
-        let t = test::Test::new(&mut store, &mut instance, |host| {
+        let instance = linker.instantiate(&mut store, &module)?;
+        let t = test::Test::new(&mut store, &instance, |host| {
             host.test_data.as_mut().unwrap()
         })?;
         let _ = t.test(&mut store).expect("Error running the test method");
@@ -260,12 +260,15 @@ mod runtime {
         Ok((engine, module, linker, store))
     }
 
-    fn exec_core<T>(mut store: Store<Context<T>>, mut instance: Instance) -> Result<()> {
-        let t = test::Test::new(&mut store, &mut instance, |host| {
+    fn exec_core<T>(mut store: Store<Context<T>>, instance: Instance) -> Result<()> {
+        let t = test::Test::new(&mut store, &instance, |host| {
             host.test_data.as_mut().unwrap()
         })?;
-        let _ = t.test(&mut store).expect("Error running the test method");
-        Ok(())
+        let result = t.test(&mut store).expect("Error running the test method");
+        match result {
+            Ok(()) | Err(test::Error::Success) => Ok(()),
+            Err(test::Error::Failure) => Err(anyhow::anyhow!("Test returned failure")),
+        }
     }
 
     pub fn default_config() -> Result<Config> {
