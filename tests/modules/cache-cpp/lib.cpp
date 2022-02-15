@@ -7,27 +7,62 @@
 #include "bindings/wasi-cache.h"
 #include "bindings/test.h"
 
+// TODO: for some reason bindings are returning
+// -1 upon success instead of WASI_CACHE_ERROR_SUCCESS (0)
+const wasi_cache_error_t SUCCESS_VALUE = -1;
+
 test_error_t test_test(void)
 {
-    char *key = "abc";
-    char *value = "def";
-    printf("Writing contents `%s` in storage `%s`", value, key);
+    const char* key = "abc";
+    const char* value = "def";
+    printf("Writing contents `%s` in storage `%s`\n", value, key);
 
-    wasi_cache_string_t *skey;
-    skey->len = strlen(key);
-    skey->ptr = key;
+    wasi_cache_string_t skey{
+        .ptr = strdup(key),
+        .len = strlen(key),
+    };
 
-    wasi_cache_payload_t *svalue;
-    svalue->len = strlen(value);
-    svalue->ptr = (uint8_t *)value;
+    wasi_cache_payload_t svalue{
+        .ptr = (uint8_t*)strdup(value),
+        .len = strlen(value),
+    };
 
-    wasi_cache_set(skey, svalue, NULL);
+    auto result = wasi_cache_set(&skey, &svalue, nullptr);
+    if (result != SUCCESS_VALUE) {
+        fprintf(stderr, "Failed to set value\n");
+        return TEST_ERROR_FAILURE;
+    }
 
-    wasi_cache_payload_t *ret;
-    wasi_cache_get(skey, ret);
-    printf("Retrieved from `%s`: `%s`", key, (char *)ret->ptr);
+    wasi_cache_payload_t ret{};
+    result = wasi_cache_get(&skey, &ret);
+    if (result != SUCCESS_VALUE) {
+        fprintf(stderr, "Failed to get value\n");
+        return TEST_ERROR_FAILURE;
+    }
 
-    assert(svalue->len == ret->len);
+    if (ret.ptr == nullptr) {
+        fprintf(stderr, "No value returned, failing test\n");
+        return TEST_ERROR_FAILURE;
+    }
 
-    return 0;
+    printf("Retrieved from `%s`: `%s`\n", key, (char*)ret.ptr);
+
+    if (svalue.len != ret.len ||
+        memcmp(svalue.ptr, ret.ptr, svalue.len) != 0) {
+        fprintf(stderr, "Values don't match, failing test\n");
+        return TEST_ERROR_FAILURE;
+    }
+
+    result = wasi_cache_delete(&skey);
+    if (result != SUCCESS_VALUE) {
+        fprintf(stderr, "Failed to delete value\n");
+        return TEST_ERROR_FAILURE;
+    }
+
+    free(svalue.ptr);
+    free(skey.ptr);
+    free(ret.ptr);
+
+    printf("Test was successful\n");
+    return TEST_ERROR_SUCCESS;
 }

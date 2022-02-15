@@ -7,9 +7,9 @@ bindgen:
 	$(WIT_BINDGEN) c --export ../../test.wit --out-dir bindings
 	
 build:
-	$(WASI_CC) -I . -I ./bindings -c -o wasi_cache.o bindings/wasi-cache.c
-	$(WASI_CC) -I . -I ./bindings -c -o test.o bindings/test.c
-	$(WASI_CC) -mexec-model=reactor lib.cpp wasi_cache.o test.o -o ctest.wasm
+	$(WASI_CC) -Wall -I . -I ./bindings -c -o wasi_cache.o bindings/wasi-cache.c
+	$(WASI_CC) -Wall -I . -I ./bindings -c -o test.o bindings/test.c
+	$(WASI_CC) -Wall -mexec-model=reactor lib.cpp wasi_cache.o test.o -o ctest.wasm
 
 
 link: link-fs
