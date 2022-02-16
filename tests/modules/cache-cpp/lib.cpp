@@ -7,8 +7,8 @@
 #include "bindings/wasi-cache.h"
 #include "bindings/test.h"
 
-// TODO: for some reason bindings are returning
-// -1 upon success instead of WASI_CACHE_ERROR_SUCCESS (0)
+// wit-bindgen doesn’t create a constant for the 
+// “success” case of the `unexpected`, so define one ourselves:
 const wasi_cache_error_t SUCCESS_VALUE = -1;
 
 test_error_t test_test(void)
