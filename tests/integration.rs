@@ -199,6 +199,34 @@ mod wasi_log_tests {
     }
 }
 
+#[cfg(test)]
+mod wasi_envvars_tests {
+    use super::runtime::*;
+    use anyhow::Result;
+    use envvars_wasmtime::*;
+    use wasmtime::Linker;
+
+    const RUST_ENVVARS_TEST: &str = "tests/modules/envvars-rust/target/wasm32-wasi/release/envvars_rust.wasm";
+
+    #[test]
+    fn test_envvars_rust() -> Result<()> {
+        init();
+
+        let mut my_env = EnvVars::new_with_predicate(|(key, _value)| key == "path");
+        my_env.with("good_key", "samwise")
+              .with("TESTCONVERT", "123");
+
+        let data = Some(my_env);
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            envvars_wasmtime::add_to_linker(linker, |ctx| -> &mut EnvVars {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(RUST_ENVVARS_TEST, data, add_imports)
+    }
+}
+
 mod runtime {
     use anyhow::Result;
     use wasi_cap_std_sync::WasiCtxBuilder;

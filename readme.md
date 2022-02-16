@@ -14,6 +14,7 @@ Interfaces:
 - caching
 - logging
 - outbound HTTP
+- environment variables
 
 The interfaces in this repository are at a very early stages of development, and
 are intended to serve as a start for the standardization effort. Improvements

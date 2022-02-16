@@ -7,7 +7,7 @@
 [dependencies]
 
 [workspace]
-    members = [ "crates/cache-redis-wasmtime", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime" ]
+    members = [ "crates/cache-redis-wasmtime", "crates/envvars-wasmtime", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime" ]
 
 
 [dev-dependencies]
@@ -17,6 +17,7 @@
     log                         = { version = "0.4", default-features = false }
     wasi-outbound-http-wasmtime = { path = "crates/http-wasmtime" }
     log-wasmtime                = { path = "crates/log-wasmtime" }
+    envvars-wasmtime            = { path = "crates/envvars-wasmtime" }
     tokio                       = { version = "1.4.0", features = [ "full" ] }
     wasmtime                    = "0.33"
     wasmtime-wasi               = "0.33"

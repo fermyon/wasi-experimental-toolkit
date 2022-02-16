@@ -15,6 +15,7 @@ const HTTP_RUST_TEST: &str = "tests/modules/http-rust-hello";
 const NN_TEST: &str = "tests/modules/nn-demo";
 const CACHE_RUST_TEST: &str = "tests/modules/cache-rust";
 const CACHE_CPP_TEST: &str = "tests/modules/cache-cpp";
+const ENVVARS_RUST_TEST: &str = "tests/modules/envvars-rust";
 const LOG_RUST_TEST: &str = "tests/modules/rust-log";
 
 fn main() {
@@ -24,10 +25,14 @@ fn main() {
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_AZURE);
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_FS);
 
+    println!("cargo:rerun-if-changed={}/src/lib.rs", ENVVARS_RUST_TEST);
+
     check_tools();
 
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
+
+    cargo_wasi_build(ENVVARS_RUST_TEST);
 
     cargo_wasi_build(HTTP_RUST_TEST);
     cargo_wasi_build(CACHE_RUST_TEST);
