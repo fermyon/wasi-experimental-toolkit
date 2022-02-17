@@ -38,5 +38,6 @@ jobs:
       - name: Build
         run: cargo build
       - name: Run simple test
-        run:
+        run: |
+          PATH=$PATH:/home/runner/.tiup/bin
           cargo test --all --all-features -- --nocapture
