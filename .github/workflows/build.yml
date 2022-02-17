@@ -35,9 +35,6 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh
           source /home/runner/.profile
           which tiup
-      - name: "Start tiup"
-        run: |
-          /home/runner/.tiup/bin/tiup playground --mode tikv-slim --without-monitor
       - name: Build
         run: cargo build
       - name: Run simple test

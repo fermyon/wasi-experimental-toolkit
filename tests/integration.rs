@@ -198,10 +198,10 @@ mod cache_tests {
     impl TiKVController {
         pub fn new() -> Result<TiKVController> {
             let server_handle = Command::new(TIUP_TIKV_COMMAND)
-                .args(["playground", "--mode", "tikv-slim"])
+                .args(["playground", "--mode", "tikv-slim", "--without-monitor"])
                 .spawn().expect("tiup command failed to start");
 
-            std::thread::sleep(std::time::Duration::from_secs(30));
+            std::thread::sleep(std::time::Duration::from_secs(60));
 
             Ok(Self {
                 pd_endpoint: "127.0.0.1:2379".to_string(),
