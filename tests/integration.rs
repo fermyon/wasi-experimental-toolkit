@@ -1,4 +1,51 @@
 #[cfg(test)]
+mod nn_tests {
+    use super::runtime::*;
+    use anyhow::Result;
+    use wasi_nn_tract_wasmtime::{wasi_nn::WasiNnTables, WasiNnTractCtx};
+    use wasmtime::*;
+
+    const NN_RUST_TEST: &str = "tests/modules/nn-demo/target/wasm32-wasi/release/nn_demo.wasm";
+
+    #[test]
+    fn test_empty_nn() -> Result<()> {
+        type WasiNnTable = WasiNnTables<WasiNnTractCtx>;
+
+        let runtime_data = Some((
+            WasiNnTractCtx::default(),
+            WasiNnTables::<WasiNnTractCtx>::default(),
+        ));
+        let wasi = default_wasi();
+        let test_data = Some(test::TestData::default());
+        let ctx = Context {
+            wasi,
+            runtime_data,
+            test_data,
+        };
+
+        let add_imports = |linker| {
+            wasi_nn_tract_wasmtime::add_to_linker(linker, |ctx: &mut Context<(WasiNnTractCtx, WasiNnTable)>| -> (&mut WasiNnTractCtx, &mut WasiNnTable) {
+                let ct = ctx.runtime_data.as_mut().unwrap();
+                (&mut ct.0, &mut ct.1)
+            })
+        };
+        let engine = Engine::new(&default_config()?)?;
+        let module = Module::from_file(&engine, NN_RUST_TEST)?;
+        let mut linker = Linker::new(&engine);
+        wasmtime_wasi::add_to_linker(&mut linker, |cx: &mut Context<_>| &mut cx.wasi)?;
+        let mut store = Store::new(&engine, ctx);
+
+        add_imports(&mut linker)?;
+        let mut instance = linker.instantiate(&mut store, &module)?;
+        let t = test::Test::new(&mut store, &mut instance, |host| {
+            host.test_data.as_mut().unwrap()
+        })?;
+        let _ = t.test(&mut store).expect("Error running the test method");
+        Ok(())
+    }
+}
+
+#[cfg(test)]
 mod http_tests {
     use super::runtime::*;
     use anyhow::Result;
@@ -48,8 +95,10 @@ mod cache_tests {
         process::{Child, Command},
     };
     use wasmtime::Linker;
+    use tikv_rust_client_wasmtime::TikvClient;
 
     const REDIS_SERVER_CLI: &str = "redis-server";
+    const TIUP_TIKV_COMMAND: &str = "tiup";
     const CACHE_RUST_TEST: &str =
         "tests/modules/cache-rust/target/wasm32-wasi/release/cache_rust.wasm";
     const CACHE_RUST_LINKED_FS_TEST: &str =
@@ -71,6 +120,22 @@ mod cache_tests {
 
         exec(CACHE_CPP_TEST, data.clone(), add_imports)?;
         exec(CACHE_RUST_TEST, data, add_imports)
+    }
+
+    #[test]
+    fn test_tikv_get_set() -> Result<()> {
+        init();
+
+        let controller = TiKVController::new()?;
+        let data = Some(TikvClient::new(&controller.pd_endpoint)?);
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            tikv_rust_client_wasmtime::add_to_linker(linker, |ctx| -> &mut TikvClient {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
+        exec(CACHE_RUST_TEST, data, add_imports);
+        Ok(())
     }
 
     #[test]
@@ -125,23 +190,52 @@ mod cache_tests {
             .unwrap()
             .port()
     }
+
+    pub struct TiKVController {
+        pub pd_endpoint: String,
+        server_handle: Child,
+    }
+
+    impl TiKVController {
+        pub fn new() -> Result<TiKVController> {
+            let server_handle = Command::new(TIUP_TIKV_COMMAND)
+                .args(["playground", "--mode", "tikv-slim"])
+                .spawn().expect("tiup command failed to start");
+
+            std::thread::sleep(std::time::Duration::from_secs(30));
+
+            Ok(Self {
+                pd_endpoint: "127.0.0.1:2379".to_string(),
+                server_handle,
+            })
+        }
+    }
+
+    impl Drop for TiKVController {
+        fn drop(&mut self) {
+            let _ = self.server_handle.kill();
+            if let Ok(mut child) = Command::new(TIUP_TIKV_COMMAND).args(["clean", "--all"]).spawn() {
+                std::thread::sleep(std::time::Duration::from_secs(10));
+                child.kill().expect("command wasn't running");
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod wasi_log_tests {
     use super::runtime::*;
-    use log_wasmtime::WasiLogger;
     use anyhow::Result;
+    use log_wasmtime::WasiLogger;
     use wasmtime::Linker;
 
-    const RUST_LOG_TEST: &str =
-    "tests/modules/rust-log/target/wasm32-wasi/release/rust_log.wasm";
-    
+    const RUST_LOG_TEST: &str = "tests/modules/rust-log/target/wasm32-wasi/release/rust_log.wasm";
+
     #[test]
     fn test_rust_log() -> Result<()> {
         init();
-        
-        let data = Some(WasiLogger{});
+
+        let data = Some(WasiLogger {});
 
         let add_imports = |linker: &mut Linker<Context<_>>| {
             log_wasmtime::add_to_linker(linker, |ctx| -> &mut WasiLogger {
@@ -214,12 +308,15 @@ mod runtime {
         Ok((engine, module, linker, store))
     }
 
-    fn exec_core<T>(mut store: Store<Context<T>>, mut instance: Instance) -> Result<()> {
-        let t = test::Test::new(&mut store, &mut instance, |host| {
+    fn exec_core<T>(mut store: Store<Context<T>>, instance: Instance) -> Result<()> {
+        let t = test::Test::new(&mut store, &instance, |host| {
             host.test_data.as_mut().unwrap()
         })?;
-        let _ = t.test(&mut store).expect("Error running the test method");
-        Ok(())
+        let result = t.test(&mut store).expect("Error running the test method");
+        match result {
+            Ok(()) | Err(test::Error::Success) => Ok(()),
+            Err(test::Error::Failure) => Err(anyhow::anyhow!("Test returned failure")),
+        }
     }
 
     pub fn default_config() -> Result<Config> {
