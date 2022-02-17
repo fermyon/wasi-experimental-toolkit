@@ -134,8 +134,7 @@ mod cache_tests {
             })
         };
 
-        exec(CACHE_RUST_TEST, data, add_imports);
-        Ok(())
+        exec(CACHE_RUST_TEST, data, add_imports)
     }
 
     #[test]
