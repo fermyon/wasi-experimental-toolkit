@@ -37,7 +37,7 @@ jobs:
           which tiup
       - name: "Start tiup"
         run: |
-          tiup playground --mode tikv-slim --without-monitor
+          /home/runner/.tiup/bin/tiup playground --mode tikv-slim --without-monitor
       - name: Build
         run: cargo build
       - name: Run simple test
