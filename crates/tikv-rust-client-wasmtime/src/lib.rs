@@ -32,7 +32,10 @@ impl wasi_cache::WasiCache for TikvClient {
     fn get(&mut self, key: &str) -> Result<PayloadResult, Error> {
         log::info!("getting key {}", key);
         let value = self.get(key)?;
-        value.ok_or(wasi_cache::Error::Error)
+        match value {
+            Some(value) => Ok(value),
+            None => Ok(vec![]),
+        }
     }
 
     /// Delete the entry for the given key.

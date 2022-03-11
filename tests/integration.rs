@@ -126,8 +126,7 @@ mod cache_tests {
     fn test_tikv_get_set() -> Result<()> {
         init();
 
-        let controller = TiKVController::new()?;
-        let data = Some(TikvClient::new(&controller.pd_endpoint)?);
+        let data = Some(TikvClient::new("127.0.0.1:2379")?);
         let add_imports = |linker: &mut Linker<Context<_>>| {
             tikv_rust_client_wasmtime::add_to_linker(linker, |ctx| -> &mut TikvClient {
                 ctx.runtime_data.as_mut().unwrap()
@@ -188,36 +187,6 @@ mod cache_tests {
             .local_addr()
             .unwrap()
             .port()
-    }
-
-    pub struct TiKVController {
-        pub pd_endpoint: String,
-        server_handle: Child,
-    }
-
-    impl TiKVController {
-        pub fn new() -> Result<TiKVController> {
-            let server_handle = Command::new(TIUP_TIKV_COMMAND)
-                .args(["playground", "--mode", "tikv-slim", "--without-monitor"])
-                .spawn().expect("tiup command failed to start");
-
-            std::thread::sleep(std::time::Duration::from_secs(60));
-
-            Ok(Self {
-                pd_endpoint: "127.0.0.1:2379".to_string(),
-                server_handle,
-            })
-        }
-    }
-
-    impl Drop for TiKVController {
-        fn drop(&mut self) {
-            let _ = self.server_handle.kill();
-            if let Ok(mut child) = Command::new(TIUP_TIKV_COMMAND).args(["clean", "--all"]).spawn() {
-                std::thread::sleep(std::time::Duration::from_secs(10));
-                child.kill().expect("command wasn't running");
-            }
-        }
     }
 }
 

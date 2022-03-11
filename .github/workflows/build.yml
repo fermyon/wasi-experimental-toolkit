@@ -37,7 +37,8 @@ jobs:
           which tiup
       - name: Build
         run: cargo build
+      - name: "Start TiUP Playground"
+        run: /home/runner/.tiup/bin/tiup playground --mode tikv-slim --kv 3 --without-monitor &
       - name: Run simple test
         run: |
-          PATH=$PATH:/home/runner/.tiup/bin
           cargo test --all --all-features -- --nocapture
