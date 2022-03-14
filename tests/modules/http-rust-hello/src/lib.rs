@@ -9,7 +9,7 @@ impl test::Test for Test {
     fn test() -> Result<(), test::Error> {
         let req = Request {
             method: Method::Get,
-            uri: "https://api.brigade.sh/healthz",
+            uri: "https://example.com",
             headers: &[],
             params: &[],
             body: None,
@@ -22,7 +22,6 @@ impl test::Test for Test {
         println!("Body: {}", body);
 
         assert_eq!(200, res.status);
-        assert_eq!("", body);
 
         Ok(())
     }

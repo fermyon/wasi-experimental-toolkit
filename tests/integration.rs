@@ -58,7 +58,7 @@ mod http_tests {
     #[test]
     fn test_http_allowed() -> Result<()> {
         let data = Some(OutboundHttp::new(Some(vec![
-            "https://api.brigade.sh".to_string()
+            "https://example.com".to_string()
         ])));
 
         let add_imports = |linker: &mut Linker<Context<_>>| {
