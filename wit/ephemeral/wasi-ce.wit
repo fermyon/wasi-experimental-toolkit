@@ -1,0 +1,31 @@
+use * from types
+
+
+// CloudEvent
+// record cloudevent {
+//     "id": string,
+//     "source": string,
+//     "specversion": string,
+//     "type": string,
+// }
+
+// record cloudevent-options {
+//     "datacontenttype": option<string>,
+//     "dataschema": option<string>,
+//     "subject": option<string>,
+//     "time": option<string>,
+//     "data": option<data>,
+// }
+
+type data = list<u8>
+
+record cloudevent {
+    "id": string,
+    "source": string,
+    "specversion": string,
+    "type": string,
+    "data": option<data>
+}
+
+ce-handler: function(event: cloudevent) -> expected<cloudevent, error>
+// some-random-func: function(d: data) -> data

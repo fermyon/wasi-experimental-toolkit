@@ -10,12 +10,14 @@ const WIT_DIRECTORY: &str = "wit/ephemeral/*";
 
 const CACHE_FS: &str = "crates/cache-fs";
 const CACHE_AZURE: &str = "crates/cache-azure-blobstorage";
+const CE: &str = "crates/ce";
 
 const HTTP_RUST_TEST: &str = "tests/modules/http-rust-hello";
 const NN_TEST: &str = "tests/modules/nn-demo";
 const CACHE_RUST_TEST: &str = "tests/modules/cache-rust";
 const CACHE_CPP_TEST: &str = "tests/modules/cache-cpp";
 const LOG_RUST_TEST: &str = "tests/modules/rust-log";
+const CLOUDEVENT_TEST: &str = "tests/modules/cloudevent-demo";
 
 fn main() {
     println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
@@ -23,22 +25,28 @@ fn main() {
     println!("cargo:rerun-if-changed={}/src/lib.rs", NN_TEST);
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_AZURE);
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_FS);
+    println!("cargo:rerun-if-changed={}/src/lib.rs", CE);
+    println!("cargo:rerun-if-changed={}/src/lib.rs", CLOUDEVENT_TEST);
 
     check_tools();
 
     cargo_wasi_build(CACHE_FS);
     cargo_wasi_build(CACHE_AZURE);
+    cargo_wasi_build(CE);
 
     cargo_wasi_build(HTTP_RUST_TEST);
     cargo_wasi_build(CACHE_RUST_TEST);
     cargo_wasi_build(LOG_RUST_TEST);
     cargo_wasi_build(NN_TEST);
+    cargo_wasi_build(CLOUDEVENT_TEST);
 
 
     wasi_sdk_make(CACHE_CPP_TEST);
 
     make_link(CACHE_RUST_TEST);
     make_link(CACHE_CPP_TEST);
+    make_link(CLOUDEVENT_TEST);
+    
 }
 
 fn cargo_wasi_build(dir: &str) {

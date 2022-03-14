@@ -215,6 +215,71 @@ mod wasi_log_tests {
     }
 }
 
+#[cfg(test)]
+mod wasi_ce_tests {
+    use super::runtime::*;
+    const CE_LINKED_TEST: &str = "tests/modules/cloudevent-demo/target/wasm32-wasi/release/ce_linked.wasm";
+
+    #[test]
+    fn test_ce() {
+        init();
+
+        let data: Option<u32> = None;
+        exec_with_default_imports(CE_LINKED_TEST, data).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod wasi_ce_tests_wasmtime {
+    use crate::runtime::{init, default_wasi, default_config};
+
+    use anyhow::Result;
+    use wasi_cap_std_sync::WasiCtxBuilder;
+    use wasi_common::WasiCtx;
+    use wasmtime::{Config, Engine, Instance, Linker, Module, Store};
+    use wasmtime_wasi::*;
+
+    wit_bindgen_wasmtime::import!("wit/ephemeral/wasi-ce.wit");
+    const CE_TEST: &str = "crates/ce/target/wasm32-wasi/release/ce.wasm";
+    pub struct Context {
+        pub wasi: WasiCtx,
+        pub wasi_data: Option<wasi_ce::WasiCeData>
+    }
+    #[test]
+    fn test_ce_wasmtime() -> Result<()> {
+        init();
+
+        // type WasiNnTable = WasiNnTables<WasiNnTractCtx>;
+
+        let wasi_data = Some(wasi_ce::WasiCeData::default());
+        let wasi = default_wasi();
+        let ctx = Context {
+            wasi,
+            wasi_data,
+        };
+        let engine = Engine::new(&default_config()?)?;
+        let module = Module::from_file(&engine, CE_TEST)?;
+        let mut linker = Linker::new(&engine);
+        wasmtime_wasi::add_to_linker(&mut linker, |cx: &mut Context| &mut cx.wasi)?;
+        let mut store = Store::new(&engine, ctx);
+        let mut instance = linker.instantiate(&mut store, &module)?;
+        let event = wasi_ce::CloudeventParam {
+            id: "aaa",
+            source: "/hello",
+            specversion: "1.0",
+            type_: "PUT",
+            data: Some(b"hello world"),
+        };
+
+        let t = wasi_ce::WasiCe::new(&mut store, &instance, |host| {
+            host.wasi_data.as_mut().unwrap()
+        })?;
+        let res = t.ce_handler(&mut store, event);
+        Ok(())
+
+    }
+}
+
 mod runtime {
     use anyhow::Result;
     use wasi_cap_std_sync::WasiCtxBuilder;

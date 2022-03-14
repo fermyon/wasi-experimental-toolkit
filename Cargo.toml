@@ -7,7 +7,7 @@
 [dependencies]
 
 [workspace]
-    members = [ "crates/cache-redis-wasmtime", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime", "crates/tikv-rust-client-wasmtime" ]
+    members = [ "crates/cache-redis-wasmtime", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime", "crates/tikv-rust-client-wasmtime"]
 
 
 [dev-dependencies]
@@ -24,4 +24,4 @@
     wasi-cap-std-sync           = "0.33"
     wit-bindgen-wasmtime        = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "2e654dc82b7f9331719ba617a36ed5967b2aecb0" }
     wasi-nn-tract-wasmtime      = { path = "crates/nn-tract-wasmtime" }
-    tikv-rust-client-wasmtime = { path = "crates/tikv-rust-client-wasmtime"}
+    tikv-rust-client-wasmtime   = { path = "crates/tikv-rust-client-wasmtime"}
