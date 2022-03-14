@@ -221,7 +221,7 @@ mod wasi_ce_tests {
     const CE_LINKED_TEST: &str = "tests/modules/cloudevent-demo/target/wasm32-wasi/release/ce_linked.wasm";
 
     #[test]
-    fn test_ce() {
+    fn test_ce_linked() {
         init();
 
         let data: Option<u32> = None;
@@ -263,18 +263,16 @@ mod wasi_ce_tests_wasmtime {
         wasmtime_wasi::add_to_linker(&mut linker, |cx: &mut Context| &mut cx.wasi)?;
         let mut store = Store::new(&engine, ctx);
         let mut instance = linker.instantiate(&mut store, &module)?;
-        let event = wasi_ce::CloudeventParam {
-            id: "aaa",
-            source: "/hello",
-            specversion: "1.0",
-            type_: "PUT",
-            data: Some(b"hello world"),
-        };
 
         let t = wasi_ce::WasiCe::new(&mut store, &instance, |host| {
             host.wasi_data.as_mut().unwrap()
         })?;
-        let res = t.ce_handler(&mut store, event);
+        let event = t.cloudevent_create(&mut store)?;
+        t.cloudevent_set_id(&mut store, &event, "aaa");
+        let res = t.ce_handler(&mut store, &event).unwrap();
+        let res = t.cloudevent_get_id(&mut store, &event)?;
+        assert_eq!(res, "aaa");
+        t.drop_cloudevent(&mut store, event);
         Ok(())
 
     }
