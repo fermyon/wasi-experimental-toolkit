@@ -1,35 +1,6 @@
 use * from types
 
-
-// CloudEvent
-// record cloudevent {
-//     "id": string,
-//     "source": string,
-//     "specversion": string,
-//     "type": string,
-// }
-
-// record cloudevent-options {
-//     "datacontenttype": option<string>,
-//     "dataschema": option<string>,
-//     "subject": option<string>,
-//     "time": option<string>,
-//     "data": option<data>,
-// }
-
 type data = list<u8>
-
-// record cloudevent {
-//     "id": string,
-//     "source": string,
-//     "specversion": string,
-//     "type": string,
-//     "data": option<data>,
-//     "datacontenttype": option<string>,
-//     "dataschema": option<string>,
-//     "subject": option<string>,
-//     "time": option<string>,
-// }
 
 resource cloudevent {
     static create: function() -> cloudevent
@@ -52,14 +23,5 @@ resource cloudevent {
     set-time: function(time: string)
     get-time: function() -> string
 }
-// set-source: function(source: string) -> expected<cloudevent, error>
-// set-specversion: function(specversion: string) -> expected<cloudevent, error>
-// set-type: function(type: string) -> expected<cloudevent, error>
-// set-data: function(data: data) -> expected<cloudevent, error>
-// set-datacontenttype: function(datacontenttype: string) -> expected<cloudevent, error>
-// set-dataschema: function(dataschema: string) -> expected<cloudevent, error>
-// set-subject: function(subject: string) -> expected<cloudevent, error>
-// set-time: function(time: string) -> expected<cloudevent, error>
 
 ce-handler: function(event: cloudevent) -> expected<cloudevent, error>
-// some-random-func: function(d: data) -> data

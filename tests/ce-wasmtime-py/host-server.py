@@ -1,6 +1,6 @@
 from flask import Flask, request
 
-from cloudevents.http import from_http, CloudEvent
+from cloudevents.http import CloudEvent
 from host_py import run
 
 app = Flask(__name__)
