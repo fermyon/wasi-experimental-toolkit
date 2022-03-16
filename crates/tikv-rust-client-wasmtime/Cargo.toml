@@ -1,0 +1,16 @@
+[package]
+    name    = "tikv-rust-client-wasmtime"
+    version = "0.1.0"
+    edition = "2021"
+    authors = [ "Mossaka <jiazho@microsoft.com>" ]
+
+[lib]
+    doctest = false
+
+[dependencies]
+    anyhow               = "1.0"
+    env_logger           = "0.9"
+    log                  = { version = "0.4", default-features = false }
+    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "2e654dc82b7f9331719ba617a36ed5967b2aecb0" }
+    tikv-client = { git="https://github.com/tikv/client-rust.git", branch="master" }
+    tokio = { version="1.6.1", features=["full"] }

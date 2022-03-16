@@ -36,8 +36,8 @@ mod nn_tests {
         let mut store = Store::new(&engine, ctx);
 
         add_imports(&mut linker)?;
-        let instance = linker.instantiate(&mut store, &module)?;
-        let t = test::Test::new(&mut store, &instance, |host| {
+        let mut instance = linker.instantiate(&mut store, &module)?;
+        let t = test::Test::new(&mut store, &mut instance, |host| {
             host.test_data.as_mut().unwrap()
         })?;
         let _ = t.test(&mut store).expect("Error running the test method");
@@ -58,7 +58,7 @@ mod http_tests {
     #[test]
     fn test_http_allowed() -> Result<()> {
         let data = Some(OutboundHttp::new(Some(vec![
-            "https://api.brigade.sh".to_string()
+            "https://example.com".to_string()
         ])));
 
         let add_imports = |linker: &mut Linker<Context<_>>| {
@@ -95,8 +95,10 @@ mod cache_tests {
         process::{Child, Command},
     };
     use wasmtime::Linker;
+    use tikv_rust_client_wasmtime::TikvClient;
 
     const REDIS_SERVER_CLI: &str = "redis-server";
+    const TIUP_TIKV_COMMAND: &str = "tiup";
     const CACHE_RUST_TEST: &str =
         "tests/modules/cache-rust/target/wasm32-wasi/release/cache_rust.wasm";
     const CACHE_RUST_LINKED_FS_TEST: &str =
@@ -117,6 +119,20 @@ mod cache_tests {
         };
 
         exec(CACHE_CPP_TEST, data.clone(), add_imports)?;
+        exec(CACHE_RUST_TEST, data, add_imports)
+    }
+
+    #[test]
+    fn test_tikv_get_set() -> Result<()> {
+        init();
+
+        let data = Some(TikvClient::new("127.0.0.1:2379")?);
+        let add_imports = |linker: &mut Linker<Context<_>>| {
+            tikv_rust_client_wasmtime::add_to_linker(linker, |ctx| -> &mut TikvClient {
+                ctx.runtime_data.as_mut().unwrap()
+            })
+        };
+
         exec(CACHE_RUST_TEST, data, add_imports)
     }
 
