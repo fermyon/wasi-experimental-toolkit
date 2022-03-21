@@ -12,8 +12,16 @@ impl test::Test for Test {
         let ce = wasi_ce::Cloudevent::create();
         ce.set_id("aaa");
         let res = wasi_ce::ce_handler(&ce);
-        let id = res?.get_id();
-        println!("ce_test:: succeed, returned event id: {}", id);
+        println!("ce_test:: should fail with incomplete cloudevent");
+        assert!(res.is_err());
+
+        ce.set_source("https://example.com/event-producer");
+        ce.set_type("com.microsoft.steelthread.wasm");
+        ce.set_specversion("1.0");
+        let res = wasi_ce::ce_handler(&ce);
+        assert!(res.is_ok());
+        println!("ce_test:: succeed with id: {}", res?.get_id());
+
         Ok(())
     }
 }

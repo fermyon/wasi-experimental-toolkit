@@ -40,13 +40,11 @@ fn main() {
     cargo_wasi_build(NN_TEST);
     cargo_wasi_build(CLOUDEVENT_TEST);
 
-
     wasi_sdk_make(CACHE_CPP_TEST);
 
     make_link(CACHE_RUST_TEST);
     make_link(CACHE_CPP_TEST);
     make_link(CLOUDEVENT_TEST);
-    
 }
 
 fn cargo_wasi_build(dir: &str) {

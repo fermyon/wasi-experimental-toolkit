@@ -94,8 +94,8 @@ mod cache_tests {
         net::{Ipv4Addr, SocketAddrV4, TcpListener},
         process::{Child, Command},
     };
-    use wasmtime::Linker;
     use tikv_rust_client_wasmtime::TikvClient;
+    use wasmtime::Linker;
 
     const REDIS_SERVER_CLI: &str = "redis-server";
     const TIUP_TIKV_COMMAND: &str = "tiup";
@@ -218,7 +218,8 @@ mod wasi_log_tests {
 #[cfg(test)]
 mod wasi_ce_tests {
     use super::runtime::*;
-    const CE_LINKED_TEST: &str = "tests/modules/cloudevent-demo/target/wasm32-wasi/release/ce_linked.wasm";
+    const CE_LINKED_TEST: &str =
+        "tests/modules/cloudevent-demo/target/wasm32-wasi/release/ce_linked.wasm";
 
     #[test]
     fn test_ce_linked() {
@@ -231,7 +232,7 @@ mod wasi_ce_tests {
 
 #[cfg(test)]
 mod wasi_ce_tests_wasmtime {
-    use crate::runtime::{init, default_wasi, default_config};
+    use crate::runtime::{default_config, default_wasi, init};
 
     use anyhow::Result;
     use wasi_cap_std_sync::WasiCtxBuilder;
@@ -243,38 +244,43 @@ mod wasi_ce_tests_wasmtime {
     const CE_TEST: &str = "crates/ce/target/wasm32-wasi/release/ce.wasm";
     pub struct Context {
         pub wasi: WasiCtx,
-        pub wasi_data: Option<wasi_ce::WasiCeData>
+        pub wasi_data: Option<wasi_ce::WasiCeData>,
     }
     #[test]
+    #[warn(unused_must_use)]
     fn test_ce_wasmtime() -> Result<()> {
         init();
 
-        // type WasiNnTable = WasiNnTables<WasiNnTractCtx>;
-
         let wasi_data = Some(wasi_ce::WasiCeData::default());
         let wasi = default_wasi();
-        let ctx = Context {
-            wasi,
-            wasi_data,
-        };
+        let ctx = Context { wasi, wasi_data };
         let engine = Engine::new(&default_config()?)?;
         let module = Module::from_file(&engine, CE_TEST)?;
         let mut linker = Linker::new(&engine);
         wasmtime_wasi::add_to_linker(&mut linker, |cx: &mut Context| &mut cx.wasi)?;
         let mut store = Store::new(&engine, ctx);
+
+        wasi_ce::WasiCe::add_to_linker(&mut linker, |cx| cx.wasi_data.as_mut().unwrap())?;
+
         let mut instance = linker.instantiate(&mut store, &module)?;
 
         let t = wasi_ce::WasiCe::new(&mut store, &instance, |host| {
             host.wasi_data.as_mut().unwrap()
         })?;
+
         let event = t.cloudevent_create(&mut store)?;
         t.cloudevent_set_id(&mut store, &event, "aaa");
         let res = t.ce_handler(&mut store, &event).unwrap();
-        let res = t.cloudevent_get_id(&mut store, &event)?;
-        assert_eq!(res, "aaa");
+        assert!(res.is_err());
+
+        t.cloudevent_set_source(&mut store, &event, "https://example.com/event-producer");
+        t.cloudevent_set_type(&mut store, &event, "com.microsoft.steelthread.wasm");
+        t.cloudevent_set_specversion(&mut store, &event, "1.0");
+        let res = t.ce_handler(&mut store, &event).unwrap();
+        assert!(res.is_ok());
+
         t.drop_cloudevent(&mut store, event);
         Ok(())
-
     }
 }
 
