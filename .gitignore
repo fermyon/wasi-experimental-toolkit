@@ -4,3 +4,5 @@ Cargo.lock
 *.wasm
 cache
 .idea
+*.pyc
+*.log
