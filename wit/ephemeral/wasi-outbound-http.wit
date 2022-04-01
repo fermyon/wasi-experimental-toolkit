@@ -1,4 +1,5 @@
 use * from http-types
 
 // Send an HTTP request and return a response or a potential error.
-request: function(req: request, config: option<request-config>) -> expected<response, http-error>
+request: function(req: request, request-config-id: option<string>) -> expected<response, http-error>
+register-request-config: function(config: request-config, id: option<string>) -> expected<string, http-error>

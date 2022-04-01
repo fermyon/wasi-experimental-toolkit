@@ -52,6 +52,7 @@ record response {
 enum http-error {
     success,
     destination-not-allowed,
+    invalid-cfg,
     invalid-url,
     request-error,
     runtime-error,
