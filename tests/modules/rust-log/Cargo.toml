@@ -11,4 +11,7 @@ authors = [ "Nitish Malhotra <nitishm@microsoft.com>" ]
 [dependencies]
     wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "f5eed0fb9f1087a2f8889194d0debeeafa789c88" }
 
+[build-dependencies]
+    wasi-log-defs = { path = "../../../crates/wasi-log-defs" }
+
 [workspace]
