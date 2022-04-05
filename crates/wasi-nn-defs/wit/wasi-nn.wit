@@ -1,0 +1,98 @@
+// WASI Machine Learning API
+// Adapted from https://github.com/WebAssembly/wasi-nn
+//
+// This module draws inspiration from the inference side of [WebNN](https://webmachinelearning.github.io/webnn/#api).
+// In other words, this API will allow a user to execute an inference using an execution graph (i.e. a model), but not
+// train or design the graph. The graph is an opaque byte sequence to this API and must be interpreted by the underlying
+// implementation of this API.
+
+// Error codes returned by functions in this API.
+enum error {
+    // No error occurred.
+    success,
+    // Caller module passed an invalid argument.
+    invalid-argument,
+    // Invalid encocing.
+    invalid-encoding,
+    // Caller module is missing a memory export.
+    missing-memory,
+    // Device or resource busy.
+    busy,
+    // Runtime Error.
+    runtime-error,
+}
+
+// The dimensions of a tensor.
+//
+// The array length matches the tensor rank and each element in the array 
+// describes the size of each dimension.
+type tensor-dimensions = list<u32>
+
+// The type of the elements in a tensor.
+enum tensor-type {
+    fp16,
+    fp32,
+    up8,
+    ip32
+}
+
+// The tensor data.
+//
+// Initially coneived as a sparse representation, each empty cell would be filled with zeros and 
+// the array length must match the product of all of the dimensions and the number of bytes in the type (e.g. a 2x2
+// tensor with 4-byte f32 elements would have a data array of length 16). Naturally, this representation requires
+// some knowledge of how to lay out data in memory--e.g. using row-major ordering--and could perhaps be improved. 
+type tensor-data = list<u8>
+
+// A tensor.
+record tensor {
+    // Describe the size of the tensor (e.g. 2x2x2x2 -> [2, 2, 2, 2]). To represent a tensor containing a single value,
+    // use `[1]` for the tensor dimensions. 
+    dimensions: tensor-dimensions,
+
+    // Describe the type of element in the tensor (e.g. f32).
+    tensor-type: tensor-type,
+    
+    // Contains the tensor data.
+    data: tensor-data,
+}
+
+// The graph initialization data. This consists of an array of buffers because implementing backends may encode their
+// graph IR in parts (e.g. OpenVINO stores its IR and weights separately).
+type graph-builder = list<u8>
+type graph-builder-array = list<graph-builder>
+
+// An execution graph for performing inference (i.e. a model).
+resource graph
+
+// Describes the encoding of the graph. This allows the API to be implemented by various backends that encode (i.e.
+// serialize) their graph IR differently.
+enum graph-encoding {
+    openvino,
+    onnx,
+    tensorflow
+}
+
+// Define where the graph should be executed.
+enum execution-target {
+    cpu,
+    gpu,
+    tpu
+}
+
+resource graph-execution-context
+
+// Load an opaque sequence of bytes to use for inference.
+load: function(builder: graph-builder-array, encoding: graph-encoding, target: execution-target) -> expected<graph, error>
+
+// Create an execution instance of a loaded graph.
+init-execution-context: function(graph: graph) -> expected<graph-execution-context, error>
+
+// Define inputs to use for inference.
+set-input: function(ctx: graph-execution-context, index: u32, tensor: tensor) -> expected<_, error>
+
+// Compute the inference on the given inputs.
+compute: function(ctx: graph-execution-context) -> expected<_, error>
+
+// Extract the outputs after inference.
+get-output: function(ctx: graph-execution-context, index: u32) -> expected<tensor, error>
