@@ -11,7 +11,7 @@ use std::sync::Arc;
 use wasi_cache::*;
 
 // The path to the cache interface is relative because this crate is in its own workspace.
-wit_bindgen_rust::export!("../../wit/ephemeral/wasi-cache.wit");
+wit_bindgen_rust::export!("wit/ephemeral/wasi-cache.wit");
 
 /// Azure implementation for the cache interface.
 /// The implementation assumes the storage container, service account,

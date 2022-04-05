@@ -3,7 +3,7 @@ WIT_BINDGEN   ?= wit-bindgen
 WASMLINK      ?= wasmlink
 
 bindgen:
-	$(WIT_BINDGEN) c --import ../../../wit/ephemeral/wasi-cache.wit --out-dir bindings
+	$(WIT_BINDGEN) c --import ../../../crates/wasi-cache-defs/wit/wasi-cache.wit --out-dir bindings
 	$(WIT_BINDGEN) c --export ../../test.wit --out-dir bindings
 	
 build:
@@ -16,7 +16,7 @@ link: link-fs
 
 link-fs:
 	$(WASMLINK) ctest.wasm \
-		--interface wasi-cache=../../../wit/ephemeral/wasi-cache.wit \
+		--interface wasi-cache=../../../crates/wasi-cache-defs/wit/wasi-cache.wit \
 		--profile wasmtime \
 		--module wasi-cache=../../../crates/cache-fs/target/wasm32-wasi/release/wasi_cache_fs.wasm \
 		--output ctest-fs-linked.wasm
