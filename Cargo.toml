@@ -7,7 +7,18 @@
 [dependencies]
 
 [workspace]
-    members = [ "crates/cache-redis-wasmtime", "crates/http-wasmtime", "crates/log-wasmtime", "crates/nn-tract-wasmtime", "crates/tikv-rust-client-wasmtime"]
+    members = [
+      "crates/wasi-cache-defs",
+      "crates/wasi-ce-defs",
+      "crates/wasi-log-defs",
+      "crates/wasi-nn-defs",
+      "crates/wasi-outbound-http-defs",
+      "crates/cache-redis-wasmtime",
+      "crates/http-wasmtime",
+      "crates/log-wasmtime",
+      "crates/nn-tract-wasmtime",
+      "crates/tikv-rust-client-wasmtime",
+    ]
 
 
 [dev-dependencies]
