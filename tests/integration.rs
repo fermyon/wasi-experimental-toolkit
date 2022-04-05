@@ -240,7 +240,7 @@ mod wasi_ce_tests_wasmtime {
     use wasmtime::{Config, Engine, Instance, Linker, Module, Store};
     use wasmtime_wasi::*;
 
-    wit_bindgen_wasmtime::import!("wit/ephemeral/wasi-ce.wit");
+    wit_bindgen_wasmtime::import!("crates/wasi-ce-defs/wit/wasi-ce.wit");
     const CE_TEST: &str = "crates/ce/target/wasm32-wasi/release/ce.wasm";
     pub struct Context {
         pub wasi: WasiCtx,
