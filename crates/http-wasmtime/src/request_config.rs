@@ -1,6 +1,6 @@
 use crate::wasi_outbound_http::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct ReqwestConfig {
     pub accept_invalid_hostnames: bool,
     pub accept_invalid_certificates: bool,

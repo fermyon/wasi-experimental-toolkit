@@ -8,7 +8,7 @@ use std::{
     sync::{Arc, RwLock},
 };
 use tokio::runtime::Handle;
-use tracing::error;
+use tracing::{debug, error};
 use wasi_outbound_http::*;
 
 mod request_config;
@@ -53,7 +53,10 @@ impl OutboundHttp {
                 let a: Vec<&str> = allowed.iter().map(|u| u.host_str().unwrap()).collect();
                 Ok(a.contains(&url_host.as_str()))
             }
-            None => Ok(false),
+            None => {
+                error!("allowed_hosts is empty, blocking the request");
+                Ok(false)
+            }
         }
     }
 }
@@ -107,8 +110,10 @@ impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
             // already executing on the same executor (compared with just
             // blocking on the current one).
             Ok(r) => block_on(r.spawn_blocking(move || -> Result<Response, HttpError> {
+                debug!("running request inside of new blocking executor");
                 let mut client_builder = Client::builder();
                 if let Some(rc) = reqwest_config {
+                    debug!(request_config = ?rc, "using request config");
                     client_builder =
                         client_builder.danger_accept_invalid_certs(rc.accept_invalid_certificates);
 
@@ -144,7 +149,34 @@ impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
             }))
             .map_err(|_| HttpError::RuntimeError)?,
             Err(_) => {
-                let res = reqwest::blocking::Client::new()
+                debug!("running request using blocking client");
+                let mut client_builder = reqwest::blocking::Client::builder();
+                if let Some(rc) = reqwest_config {
+                    debug!(request_config = ?rc, "using request config");
+                    client_builder =
+                        client_builder.danger_accept_invalid_certs(rc.accept_invalid_certificates);
+
+                    cfg_if::cfg_if! {
+                        if #[cfg(feature = "native-tls")] {
+                            client_builder = client_builder
+                                .danger_accept_invalid_hostnames(rc.accept_invalid_hostnames);
+                        } else {
+                            if rc.accept_invalid_hostnames {
+                                tracing::info!("request config: accept_invalid_hostnames cannot be enabled when rustls is used");
+                            }
+                        }
+                    }
+
+                    if let Some(identity) = rc.identity {
+                        client_builder = client_builder.identity(identity);
+                    }
+
+                    for cert in rc.extra_root_certificates {
+                        client_builder = client_builder.add_root_certificate(cert);
+                    }
+                }
+                let client = client_builder.build().unwrap();
+                let res = client
                     .request(method, url)
                     .headers(headers)
                     .body(body)
