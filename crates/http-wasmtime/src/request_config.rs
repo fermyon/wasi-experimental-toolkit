@@ -25,12 +25,12 @@ impl TryFrom<Identity<'_>> for reqwest::Identity {
                 reqwest::Identity::from_pkcs12_der(&pkcs12_der, "")
                     .map_err(|e| format!("Cannot convert identity: {}", e))
             } else if #[cfg(feature = "rustls-tls")] {
-                let mut pem_bundle = identity.key.clone();
+                let mut pem_bundle: Vec<u8> = identity.key.into();
                 if pem_bundle[pem_bundle.len() - 1] != b'\n' {
                     pem_bundle.insert(pem_bundle.len(), b'\n');
                 }
                 pem_bundle.extend_from_slice(&identity.cert);
-                reqwest::Identity::from_pem(&pem_bundle.into())
+                reqwest::Identity::from_pem(&pem_bundle)
                     .map_err(|e| format!("Cannot create identity: {:?}", e))
             } else {
                 Err("Cannot create reqwest identity, neither 'native-tls' feature nor '__rusttls' one are enabled".to_string())
