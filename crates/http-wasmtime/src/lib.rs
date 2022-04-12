@@ -143,9 +143,11 @@ impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
                         .headers(headers)
                         .body(body)
                         .send(),
-                )?;
-
-                Ok(Response::try_from(res)?)
+                );
+                if let Err(e) = &res {
+                    error!(error =? e, "http request failure");
+                }
+                Ok(Response::try_from(res?)?)
             }))
             .map_err(|_| HttpError::RuntimeError)?,
             Err(_) => {
@@ -180,8 +182,11 @@ impl wasi_outbound_http::WasiOutboundHttp for OutboundHttp {
                     .request(method, url)
                     .headers(headers)
                     .body(body)
-                    .send()?;
-                Ok(Response::try_from(res)?)
+                    .send();
+                if let Err(e) = &res {
+                    error!(error =? e, "http request failure");
+                }
+                Ok(Response::try_from(res?)?)
             }
         }
     }
