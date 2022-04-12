@@ -4,9 +4,15 @@ use std::{
 };
 
 const WIT_BINDGEN_REPO: &str = "https://github.com/bytecodealliance/wit-bindgen";
-const WIT_BINDGEN_REVISION: &str = "2e654dc82b7f9331719ba617a36ed5967b2aecb0";
+const WIT_BINDGEN_REVISION: &str = "f5eed0fb9f1087a2f8889194d0debeeafa789c88";
 
-const WIT_DIRECTORY: &str = "wit/ephemeral/*";
+const WIT_DIRECTORIES: [&str; 5] = [
+    "crates/wasi-ce-defs/wit/*",
+    "crates/wasi-nn-defs/wit/*",
+    "crates/wasi-log-defs/wit/*",
+    "crates/wasi-cache-defs/wit/*",
+    "crates/wasi-outbound-http-defs/wit/*",
+];
 
 const CACHE_FS: &str = "crates/cache-fs";
 const CACHE_AZURE: &str = "crates/cache-azure-blobstorage";
@@ -20,7 +26,9 @@ const LOG_RUST_TEST: &str = "tests/modules/rust-log";
 const CLOUDEVENT_TEST: &str = "tests/modules/cloudevent-demo";
 
 fn main() {
-    println!("cargo:rerun-if-changed={}", WIT_DIRECTORY);
+    for wit_dir in WIT_DIRECTORIES.iter() {
+        println!("cargo:rerun-if-changed={}", wit_dir);
+    }
     println!("cargo:rerun-if-changed={}/src/lib.rs", HTTP_RUST_TEST);
     println!("cargo:rerun-if-changed={}/src/lib.rs", NN_TEST);
     println!("cargo:rerun-if-changed={}/src/lib.rs", CACHE_AZURE);

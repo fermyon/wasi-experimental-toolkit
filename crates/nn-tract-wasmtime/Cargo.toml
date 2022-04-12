@@ -15,4 +15,7 @@
     tract-data           = "0.15"
     tract-linalg         = "0.15"
     tract-onnx           = "0.15"
-    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "2e654dc82b7f9331719ba617a36ed5967b2aecb0" }
+    wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "f5eed0fb9f1087a2f8889194d0debeeafa789c88" }
+
+[build-dependencies]
+    wasi-nn-defs = { path = "../wasi-nn-defs" }

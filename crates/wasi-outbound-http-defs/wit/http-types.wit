@@ -52,7 +52,35 @@ record response {
 enum http-error {
     success,
     destination-not-allowed,
+    invalid-cfg,
     invalid-url,
     request-error,
     runtime-error,
+}
+
+// Represents a private key and X509 cert as a client certificate.
+record identity{
+    key: list<u8>,
+    cert: list<u8>,
+    ca: list<u8>,
+}
+
+// The encoding of the certificate
+enum certificate-encoding {
+    der,
+    pem,
+}
+
+// A x509 certificate
+record certificate {
+    encoding: certificate-encoding,
+    data: list<u8>,
+}
+
+// HTTP client configuration
+record request-config {
+    accept-invalid-hostnames: bool,
+    accept-invalid-certificates: bool,
+    extra-root-certificates: list<certificate>,
+    identity: option<identity>,
 }

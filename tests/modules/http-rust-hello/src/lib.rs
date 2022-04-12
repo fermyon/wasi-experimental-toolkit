@@ -1,6 +1,6 @@
 use wasi_outbound_http::*;
 
-wit_bindgen_rust::import!("../../../wit/ephemeral/wasi-outbound-http.wit");
+wit_bindgen_rust::import!("wit/ephemeral/wasi-outbound-http.wit");
 wit_bindgen_rust::export!("../../test.wit");
 
 struct Test {}
@@ -14,7 +14,7 @@ impl test::Test for Test {
             params: &[],
             body: None,
         };
-        let res = wasi_outbound_http::request(req).unwrap();
+        let res = wasi_outbound_http::request(req, None).unwrap();
         let body = &res.body.unwrap();
         let body = std::str::from_utf8(body).unwrap();
 

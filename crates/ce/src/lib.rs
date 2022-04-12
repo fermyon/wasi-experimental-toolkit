@@ -5,13 +5,13 @@ use std::{
 };
 
 use wasi_ce::*;
-wit_bindgen_rust::export!("../../wit/ephemeral/wasi-ce.wit");
+wit_bindgen_rust::export!("wit/ephemeral/wasi-ce.wit");
 use wit_bindgen_rust::*;
 
 struct WasiCe {}
 
 #[derive(Default, Clone)]
-struct Cloudevent {
+pub struct Cloudevent {
     id: RefCell<String>,
     source: RefCell<String>,
     specversion: RefCell<String>,

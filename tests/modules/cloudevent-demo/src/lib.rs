@@ -1,11 +1,7 @@
-wit_bindgen_rust::import!("../../../wit/ephemeral/wasi-ce.wit");
+wit_bindgen_rust::import!("wit/ephemeral/wasi-ce.wit");
 wit_bindgen_rust::export!("../../test.wit");
 
 struct Test {}
-
-struct Cloudevent {
-    id: String,
-}
 
 impl test::Test for Test {
     fn test() -> Result<(), test::Error> {
