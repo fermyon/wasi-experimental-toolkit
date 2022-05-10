@@ -44,89 +44,95 @@ void wasi_cache_payload_free(wasi_cache_payload_t *ptr) {
   canonical_abi_free(ptr->ptr, ptr->len * 1, 1);
 }
 typedef struct {
-  // 0 if `val` is `ok`, 1 otherwise
-  uint8_t tag;
+  bool is_err;
   union {
     wasi_cache_error_t err;
   } val;
-} wasi_cache_expected_void_error_t;
+} wasi_cache_expected_unit_error_t;
 typedef struct {
-  // 0 if `val` is `ok`, 1 otherwise
-  uint8_t tag;
+  bool is_err;
   union {
     wasi_cache_payload_t ok;
     wasi_cache_error_t err;
   } val;
 } wasi_cache_expected_payload_error_t;
-static int64_t RET_AREA[3];
+
+__attribute__((aligned(4)))
+static uint8_t RET_AREA[12];
 __attribute__((import_module("wasi-cache"), import_name("set")))
 void __wasm_import_wasi_cache_set(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
 wasi_cache_error_t wasi_cache_set(wasi_cache_string_t *key, wasi_cache_payload_t *value, wasi_cache_option_u32_t *ttl) {
-  int32_t variant;
-  int32_t variant1;
-  switch ((int32_t) (*ttl).tag) {
-    case 0: {
-      variant = 0;
-      variant1 = 0;
-      break;
-    }
-    case 1: {
-      const uint32_t *payload0 = &(*ttl).val;
-      variant = 1;
-      variant1 = (int32_t) (*payload0);
-      break;
-    }
+  int32_t option;
+  int32_t option1;
+  
+  if ((*ttl).is_some) {
+    const uint32_t *payload0 = &(*ttl).val;
+    option = 1;
+    option1 = (int32_t) (*payload0);
+    
+  } else {
+    option = 0;
+    option1 = 0;
+    
   }
   int32_t ptr = (int32_t) &RET_AREA;
-  __wasm_import_wasi_cache_set((int32_t) (*key).ptr, (int32_t) (*key).len, (int32_t) (*value).ptr, (int32_t) (*value).len, variant, variant1, ptr);
-  wasi_cache_expected_void_error_t variant2;
-  variant2.tag = *((int32_t*) (ptr + 0));
-  switch ((int32_t) variant2.tag) {
+  __wasm_import_wasi_cache_set((int32_t) (*key).ptr, (int32_t) (*key).len, (int32_t) (*value).ptr, (int32_t) (*value).len, option, option1, ptr);
+  wasi_cache_expected_unit_error_t expected;
+  switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
+      expected.is_err = false;
+      
+      
       break;
     }
     case 1: {
-      variant2.val.err = *((int32_t*) (ptr + 8));
+      expected.is_err = true;
+      
+      expected.val.err = (int32_t) (*((uint8_t*) (ptr + 1)));
       break;
     }
-  }
-  return variant2.tag ? variant2.val.err : -1;
+  }return expected.is_err ? expected.val.err : -1;
 }
 __attribute__((import_module("wasi-cache"), import_name("get")))
 void __wasm_import_wasi_cache_get(int32_t, int32_t, int32_t);
 wasi_cache_error_t wasi_cache_get(wasi_cache_string_t *key, wasi_cache_payload_t *ret0) {
   int32_t ptr = (int32_t) &RET_AREA;
   __wasm_import_wasi_cache_get((int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  wasi_cache_expected_payload_error_t variant;
-  variant.tag = *((int32_t*) (ptr + 0));
-  switch ((int32_t) variant.tag) {
+  wasi_cache_expected_payload_error_t expected;
+  switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
-      variant.val.ok = (wasi_cache_payload_t) { (uint8_t*)(*((int32_t*) (ptr + 8))), (size_t)(*((int32_t*) (ptr + 16))) };
+      expected.is_err = false;
+      
+      expected.val.ok = (wasi_cache_payload_t) { (uint8_t*)(*((int32_t*) (ptr + 4))), (size_t)(*((int32_t*) (ptr + 8))) };
       break;
     }
     case 1: {
-      variant.val.err = *((int32_t*) (ptr + 8));
+      expected.is_err = true;
+      
+      expected.val.err = (int32_t) (*((uint8_t*) (ptr + 4)));
       break;
     }
-  }
-  *ret0 = variant.val.ok;
-  return variant.tag ? variant.val.err : -1;
+  }*ret0 = expected.val.ok;
+  return expected.is_err ? expected.val.err : -1;
 }
 __attribute__((import_module("wasi-cache"), import_name("delete")))
 void __wasm_import_wasi_cache_delete(int32_t, int32_t, int32_t);
 wasi_cache_error_t wasi_cache_delete(wasi_cache_string_t *key) {
   int32_t ptr = (int32_t) &RET_AREA;
   __wasm_import_wasi_cache_delete((int32_t) (*key).ptr, (int32_t) (*key).len, ptr);
-  wasi_cache_expected_void_error_t variant;
-  variant.tag = *((int32_t*) (ptr + 0));
-  switch ((int32_t) variant.tag) {
+  wasi_cache_expected_unit_error_t expected;
+  switch ((int32_t) (*((uint8_t*) (ptr + 0)))) {
     case 0: {
+      expected.is_err = false;
+      
+      
       break;
     }
     case 1: {
-      variant.val.err = *((int32_t*) (ptr + 8));
+      expected.is_err = true;
+      
+      expected.val.err = (int32_t) (*((uint8_t*) (ptr + 1)));
       break;
     }
-  }
-  return variant.tag ? variant.val.err : -1;
+  }return expected.is_err ? expected.val.err : -1;
 }

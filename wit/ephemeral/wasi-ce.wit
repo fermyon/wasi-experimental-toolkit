@@ -10,8 +10,8 @@ resource cloudevent {
     get-source: function() -> string
     set-specversion: function(specversion: string)
     get-specversion: function() -> string
-    "set-type": function("type": string)
-    "get-type": function() -> string
+    set-type: function(cetype: string)
+    get-type: function() -> string
     set-data: function(data: data)
     get-data: function() -> data
     set-datacontenttype: function(datacontenttype: string)

@@ -23,53 +23,37 @@ size_t align
   free(ptr);
 }
 typedef struct {
-  // 0 if `val` is `ok`, 1 otherwise
-  uint8_t tag;
+  bool is_err;
   union {
     test_error_t err;
   } val;
-} test_expected_void_error_t;
-static int64_t RET_AREA[2];
+} test_expected_unit_error_t;
+
+__attribute__((aligned(1)))
+static uint8_t RET_AREA[2];
 __attribute__((export_name("test")))
 int32_t __wasm_export_test_test(void) {
   test_error_t ret = test_test();
   
-  test_expected_void_error_t ret0;
+  test_expected_unit_error_t ret0;
   if (ret <= 2) {
-    ret0.tag = 1;
+    ret0.is_err = true;
     ret0.val.err = ret;
   } else {
-    ret0.tag = 0;
+    ret0.is_err = false;
     
   }
-  int32_t variant4;
-  int32_t variant5;
-  switch ((int32_t) (ret0).tag) {
-    case 0: {
-      variant4 = 0;
-      variant5 = 0;
-      break;
-    }
-    case 1: {
-      const test_error_t *payload1 = &(ret0).val.err;
-      int32_t variant;
-      switch ((int32_t) *payload1) {
-        case 0: {
-          variant = 0;
-          break;
-        }
-        case 1: {
-          variant = 1;
-          break;
-        }
-      }
-      variant4 = 1;
-      variant5 = variant;
-      break;
-    }
-  }
   int32_t ptr = (int32_t) &RET_AREA;
-  *((int32_t*)(ptr + 8)) = variant5;
-  *((int32_t*)(ptr + 0)) = variant4;
+  
+  if ((ret0).is_err) {
+    const test_error_t *payload1 = &(ret0).val.err;
+    *((int8_t*)(ptr + 0)) = 1;
+    *((int8_t*)(ptr + 1)) = (int32_t) *payload1;
+    
+  } else {
+    
+    *((int8_t*)(ptr + 0)) = 0;
+    
+  }
   return ptr;
 }

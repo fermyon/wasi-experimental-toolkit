@@ -16,7 +16,6 @@ extern "C"
   void wasi_cache_string_set(wasi_cache_string_t *ret, const char *s);
   void wasi_cache_string_dup(wasi_cache_string_t *ret, const char *s);
   void wasi_cache_string_free(wasi_cache_string_t *ret);
-  // General purpose error.
   typedef uint8_t wasi_cache_error_t;
   #define WASI_CACHE_ERROR_SUCCESS 0
   #define WASI_CACHE_ERROR_ERROR 1
@@ -26,8 +25,7 @@ extern "C"
   } wasi_cache_payload_t;
   void wasi_cache_payload_free(wasi_cache_payload_t *ptr);
   typedef struct {
-    // `true` if `val` is present, `false` otherwise
-    bool tag;
+    bool is_some;
     uint32_t val;
   } wasi_cache_option_u32_t;
   wasi_cache_error_t wasi_cache_set(wasi_cache_string_t *key, wasi_cache_payload_t *value, wasi_cache_option_u32_t *ttl);
