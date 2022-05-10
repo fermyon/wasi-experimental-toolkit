@@ -18,10 +18,10 @@
     wasi-outbound-http-wasmtime = { path = "crates/http-wasmtime" }
     log-wasmtime                = { path = "crates/log-wasmtime" }
     tokio                       = { version = "1.4.0", features = [ "full" ] }
-    wasmtime                    = "0.33"
-    wasmtime-wasi               = "0.33"
-    wasi-common                 = "0.33"
-    wasi-cap-std-sync           = "0.33"
-    wit-bindgen-wasmtime        = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "2e654dc82b7f9331719ba617a36ed5967b2aecb0" }
+    wasmtime                    = "0.35"
+    wasmtime-wasi               = "0.35"
+    wasi-common                 = "0.35"
+    wasi-cap-std-sync           = "0.35"
+    wit-bindgen-wasmtime        = { git = "https://github.com/bytecodealliance/wit-bindgen", rev = "458a664bce7b2064d61fbd594efb2673d3130316" }
     wasi-nn-tract-wasmtime      = { path = "crates/nn-tract-wasmtime" }
     tikv-rust-client-wasmtime   = { path = "crates/tikv-rust-client-wasmtime"}
