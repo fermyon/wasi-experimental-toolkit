@@ -1,0 +1,61 @@
+// wasi-parallel
+// Adapted from https://github.com/WebAssembly/wasi-parallel.
+// This module exposes a system's ability to run parallel looping constructs. It is designed for
+// use on both CPU and non-CPU devices (e.g., GPU).
+
+// A memory buffer usable in a parallel context.
+resource buffer
+
+// The ways a buffer can be accessed.
+enum buffer-access-kind {
+    read,
+    write,
+    read-write
+}
+
+// The contents of a parallel buffer.
+// If WASI adopts a [canonical ABI](https://github.com/WebAssembly/interface-types/pull/132), 
+// this type would be replaced by `pull-buffer` and `push-buffer`.
+type buffer-data = list<u8>
+
+// The size of a buffer.
+type buffer-size = u32
+
+// A device used for parallel calls.
+resource parallel-device
+
+// The ways a buffer can be accessed.
+enum device-kind {
+    cpu,
+    discrete-gpu,
+    integrated-gpu
+}
+
+// The kernel to run in parallel.
+// TODO: It is unclear how to represent this as a `funcref`, which
+// itself may not be the final mechanism for identifying which kernel to run.
+type func = string
+
+// Error codes returned by functions in this API.
+enum error {
+    success
+}
+
+// Retrieve a a system device using a hint.
+// The implementation may choose to ignore the hint and return any kind of device.
+get-device: function(hint: device-kind) -> expected<parallel-device, error>
+
+// Create a buffer on a device.
+create-buffer: function(device: parallel-device, size: buffer-size, kind: buffer-access-kind) -> expected<buffer, error>
+
+// Assign bytes from local memory to the parallel buffer; 
+// the implementation may choose to copy or not copy the bytes.
+write-buffer: function(data: buffer-data, buffer: buffer) -> expected<_, error>
+
+// Retrieve bytes from a parallel buffer into local memory;
+// the implementation may choose to copy or not copy the bytes.
+read-buffer: function(buffer: buffer, data: buffer-data) -> expected<_, error>
+
+// Run a function in parallel--a "parallel for" mechanism.
+// TODO: perhaps return the output buffers instead of a mutable argument?
+parallel-for: function(worker: func, num-threads: u32, block-size: u32, in-buffers: list<buffer>, out-buffers: list<buffer>) -> expected<_, error>
